@@ -44,7 +44,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 154 unit + 11 e2e · tsc clean**
+**Test count: 166 unit + 14 e2e · tsc clean**
 
 ### Decisions made en route (Phase 3)
 - 2026-09-17 — `ctx` (shared app context) typed as `any`: it is the DOM-glue boundary; strict typing stays in `src/lib/`.
@@ -58,6 +58,8 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] 🚫 R11: audio unlock recipe verified on device
 - [x] Step detection DSP (POS-3): Butterworth 1–3 Hz band-pass (RBJ biquads), local-max peak picking, median-of-confirmed adaptive threshold, 300 ms refractory, interval + cadence-consistency gates
 - [x] **Map provider layer (PLAN-5..8)**: `BasemapSource` registry (osm + none; custom = one object), Web-Mercator tile math, visible-tile + tile→plan-px projection, layer stack (basemap → venue overlays → plan), canvas rendering in `<b-plan>`, schema support for `overlays` + `basemap` default, e2e (no third-party traffic by default)
+- [x] **Cadran HUD (CAD-1..4)**: pure display-state module (bearing delta, distance text, hot/warm/cold ring with shape+pulse+colour per A11Y-1, manual/estimée labels, arrow dimming POS-4, haptic schedule CAD-3) + SVG component docked on the plan view; live via sim pose
+- [x] **Permission denial e2e matrix (CAP-1/2, G2)**: zero-permission navigation completeness, settings PERM-5 states, no dead buttons, grant-without-pose keeps T0
 - [ ] Sensor shells: geolocation (PERM-4), orientation/motion (PERM-2), camera (PERM-3) + wake lock (AR-8), audio unlock (PERM-7/8), haptics (CAD-3)
 - [ ] Cadran SVG HUD (CAD-1..4)
 - [ ] AR overlay (AR-1..8) incl. jsQR ESM wrapper

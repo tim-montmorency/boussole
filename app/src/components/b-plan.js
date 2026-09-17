@@ -11,6 +11,7 @@ import { zoomForSpan } from '../lib/plan/tiles.js';
 import { pickLocalized } from '../lib/content/localize.js';
 import { haversineM, bearingDeg } from '../lib/geometry/geo.js';
 import './b-debug.js';
+import './b-cadran.js';
 
 export class BPlan extends BElement {
   connectedCallback() {
@@ -27,6 +28,7 @@ export class BPlan extends BElement {
         <p class="hint">${t('plan.setPosition')}</p>
         <p class="pos-label">${this.posLabel()}</p>
         <p class="cadran-live sr-only" role="status">${this.cadranText()}</p>
+        <div class="cadran-dock"><b-cadran></b-cadran></div>
         ${this.ctx.debugEnabled ? '<b-debug></b-debug>' : ''}
       </section>`);
     const dbg = this.querySelector('b-debug');
@@ -34,6 +36,8 @@ export class BPlan extends BElement {
       /** @type {any} */ (dbg).ctx = this.ctx;
       /** @type {any} */ (dbg)._start();
     }
+    const cad = this.querySelector('b-cadran');
+    if (cad && !/** @type {any} */ (cad).ctx) /** @type {any} */ (cad).ctx = this.ctx;
     this.setupCanvas(/** @type {HTMLCanvasElement} */ (this.querySelector('canvas')));
     // keep the live cadran text and position label fresh
     this._offs.push(this.ctx.pose.subscribe(() => {
