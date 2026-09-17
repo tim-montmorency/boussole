@@ -1,0 +1,10 @@
+{ "meta": { "venue": "example", "device": "sim" } }
+{ "t": 0, "source": "ancre", "payload": { "lat": 45.55789, "lon": -73.71610, "accuracy": 1 } }
+{ "t": 500, "source": "orientation", "payload": { "heading": 100 } }
+{ "t": 1000, "source": "gps", "payload": { "lat": 45.55788, "lon": -73.71605, "accuracy": 12 } }
+{ "t": 2000, "source": "orientation", "payload": { "heading": 95 } }
+{ "t": 3000, "source": "gps", "payload": { "lat": 45.55780, "lon": -73.71590, "accuracy": 9 } }
+{ "t": 4000, "source": "orientation", "payload": { "heading": 88 } }
+{ "t": 5000, "source": "gps", "payload": { "lat": 45.55770, "lon": -73.71570, "accuracy": 7 } }
+{ "t": 6000, "source": "orientation", "payload": { "heading": 91 } }
+{ "t": 7000, "source": "gps", "payload": { "lat": 45.55762, "lon": -73.71555, "accuracy": 6 } }

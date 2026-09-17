@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "example",
+  "name": "Venue exemple",
+  "licence": "CC-BY-4.0",
+  "lang": ["fr", "en"],
+  "origin": { "lat": 45.5577, "lon": -73.7157 },
+  "plan": {
+    "src": "plan.webp",
+    "width": 4096,
+    "height": 2731,
+    "controlPoints": [
+      { "px": 120, "py": 90, "lat": 45.55790, "lon": -73.71620 },
+      { "px": 3980, "py": 110, "lat": 45.55788, "lon": -73.71480 },
+      { "px": 3970, "py": 2640, "lat": 45.55720, "lon": -73.71482 }
+    ]
+  },
+  "defaults": { "captureRadius": 4, "revealRadius": 25, "arRange": 60, "strideLength": 0.7, "planMode": "north-up" },
+  "debug": { "startPose": { "lat": 45.55789, "lon": -73.71610, "heading": 90 } },
+  "ancres": [
+    { "id": "a-entree", "lat": 45.55789, "lon": -73.71610, "label": "Entrée principale" }
+  ],
+  "reperes": [
+    {
+      "id": "r-atrium",
+      "type": "repere",
+      "lat": 45.55760,
+      "lon": -73.71550,
+      "name": { "fr": "L'atrium", "en": "The atrium" },
+      "hint": { "fr": "Là où la lumière tombe du toit." },
+      "tableaux": [
+        { "kind": "boucle", "src": "media/atrium-loop.webm", "trigger": "regard", "loop": true },
+        { "kind": "texte", "text": { "fr": "Sous la verrière." }, "trigger": "approche" },
+        { "kind": "son", "src": "media/atrium.opus", "trigger": "zone",
+          "zone": [[45.5576, -73.7156], [45.5577, -73.7154], [45.5575, -73.7154]] }
+      ],
+      "hidden": false,
+      "captureRadius": 6
+    }
+  ],
+  "parcours": [
+    { "id": "p-decouverte", "name": { "fr": "Découverte" }, "ordered": false, "reperes": ["r-atrium"] }
+  ]
+}
