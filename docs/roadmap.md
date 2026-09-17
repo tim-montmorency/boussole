@@ -2,7 +2,7 @@
 
 Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md](sdd.md); open research in [research.md](research.md).
 
-- Updated: 2026-09-17
+- Updated: 2026-09-17 (Phase 3 T0 shell complete)
 
 ## Status legend
 `[x]` done · `[~]` in progress · `[ ]` not started · 🚫 blocked (by research/device)
@@ -34,12 +34,22 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Full trace-replay snapshot test through fusion + ambiance (needs a richer trace)
 
 ## Phase 3 — UI shell, T0
-- [ ] Hash router + Web Components (`<b-plan>`, `<b-list>`, `<b-carnet>`, `<b-settings>`)
-- [ ] Plan canvas renderer (PLAN-1..3, north-up)
-- [ ] Tier detection + pre-prompts incl. "Boussole seule" (CAP-1..3, PERM-1/5/9)
-- [ ] i18n lookup module + no-hardcoded-strings convention
-- [ ] A11Y scaffolding (A11Y-1..4)
-- [ ] Playwright T0 happy path
+- [x] i18n lookup module + fr-CA/en dicts (`i18n/index.js`, `strings.js`)
+- [x] Hash router (`#/plan`, `#/list`, `#/repere/:id`, `#/carnet`, `#/settings`, query preserved)
+- [x] Tier detection (CAP-1..3: T3 = camera + any live pose; CAP-2 denial memory)
+- [x] Plan viewport math (pan/zoom, pinch anchor, fit, clamps)
+- [x] Web Components: `<b-app>` outlet + nav (aria-current), `<b-plan>` canvas w/ tap-to-set-position + accuracy circle, `<b-list>` (text alternative, live distance/bearing), `<b-repere>` detail + check-in, `<b-carnet>`, `<b-settings>` (tier + PERM-5 statuses + PRIV-4 erase)
+- [x] main.js wiring: bundle load + DATA-4 error card, PERM-6 ancre start pose, carnet persistence
+- [x] Playwright T0 happy path — 6 e2e green (plan load, list→detail, manual position → distance/bearing, check-in → carnet persists, PERM-6 ancre, PERM-5 settings, DATA-4 error card)
+- [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
+- [ ] Repère search (M1)
+
+**Test count: 119 unit + 6 e2e · tsc clean**
+
+### Decisions made en route (Phase 3)
+- 2026-09-17 — `ctx` (shared app context) typed as `any`: it is the DOM-glue boundary; strict typing stays in `src/lib/`.
+- 2026-09-17 — e2e runs against a repo-root static server (`tools/serve.mjs`) so `/app/` and `/venues/` are both reachable without copying bundles.
+- 2026-09-17 — Playwright config uses `testMatch: **/*.e2e.js` to keep vitest and Playwright suites disjoint.
 
 ## Phase 4 — Sensors, T1–T3
 - [ ] 🚫 R1: iOS dual `requestPermission` chain verified on device

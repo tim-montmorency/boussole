@@ -1,0 +1,31 @@
+/** UI strings — fr-CA default, en fallback. */
+export const dicts = {
+  'fr-CA': {
+    'nav.plan': 'Plan', 'nav.list': 'Repères', 'nav.carnet': 'Carnet', 'nav.settings': 'Réglages',
+    'guide.cta': 'Me guider', 'guide.compassOnly': 'Boussole seule', 'guide.notNow': 'Pas maintenant',
+    'ar.cta': 'Vue caméra',
+    'repere.distance': '{d} m', 'repere.bearing': 'Cap {b}°',
+    'repere.checkin': 'Je suis là', 'repere.unverified': 'non vérifié',
+    'carnet.empty': 'Aucun repère rencontré pour l’instant.',
+    'settings.tier': 'Niveau de fonctionnalités', 'settings.erase': 'Tout effacer',
+    'settings.perm.geo': 'Position', 'settings.perm.orientation': 'Orientation', 'settings.perm.camera': 'Caméra',
+    'pos.manual': 'position manuelle', 'pos.estimated': 'position estimée',
+    'plan.setPosition': 'Touchez le plan pour indiquer votre position.',
+    'error.bundle': 'Le contenu du lieu n’a pas pu être chargé.',
+    'error.retry': 'Réessayer',
+  },
+  en: {
+    'nav.plan': 'Map', 'nav.list': 'Landmarks', 'nav.carnet': 'Logbook', 'nav.settings': 'Settings',
+    'guide.cta': 'Guide me', 'guide.compassOnly': 'Compass only', 'guide.notNow': 'Not now',
+    'ar.cta': 'Camera view',
+    'repere.distance': '{d} m', 'repere.bearing': 'Bearing {b}°',
+    'repere.checkin': 'I’m here', 'repere.unverified': 'unverified',
+    'carnet.empty': 'No landmarks encountered yet.',
+    'settings.tier': 'Feature level', 'settings.erase': 'Erase everything',
+    'settings.perm.geo': 'Location', 'settings.perm.orientation': 'Orientation', 'settings.perm.camera': 'Camera',
+    'pos.manual': 'manual position', 'pos.estimated': 'estimated position',
+    'plan.setPosition': 'Tap the map to set your position.',
+    'error.bundle': 'The venue content could not be loaded.',
+    'error.retry': 'Retry',
+  },
+};
