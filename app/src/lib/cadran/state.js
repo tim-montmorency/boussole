@@ -25,7 +25,9 @@ export function createCadran() {
     const d = haversineM(pose, target);
     const b = bearingDeg(pose, target);
     const delta = pose.heading == null ? null : angDiffDeg(pose.heading, b);
-    const distanceText = d < 10 ? `${d.toFixed(1)} m` : `${Math.round(d)} m`;
+    // far mode (works from anywhere): km with 1 decimal beyond 1 km
+    const distanceText = d >= 1000 ? `${(d / 1000).toFixed(1)} km`
+      : d < 10 ? `${d.toFixed(1)} m` : `${Math.round(d)} m`;
 
     // CAD-2: band by distance; pulse faster when closer; shape varies by band (A11Y-1)
     const band = d < HOT_M ? 'hot' : d < 25 ? 'warm' : 'cold';

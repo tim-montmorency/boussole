@@ -24,6 +24,10 @@ describe('CAD-1 rose + arrow + distance', () => {
     const far = cadranState(pose(START.lat, START.lon, 0), TARGET);
     expect(far.distanceText).toMatch(/^\d+ m$/); // ≥10 m: integer
   });
+  it('far mode: km with 1 decimal beyond 1 km (works from anywhere)', () => {
+    const mtl = cadranState(pose(45.5019, -73.5674, 0), TARGET); // ~13 km away
+    expect(mtl.distanceText).toMatch(/^\d+\.\d km$/);
+  });
   it('rose rotation is -heading (north-up text at top when heading 0)', () => {
     expect(cadranState(pose(START.lat, START.lon, 90), TARGET).roseDeg).toBe(-90);
   });

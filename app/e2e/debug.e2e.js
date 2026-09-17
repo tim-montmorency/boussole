@@ -33,15 +33,16 @@ test.describe('DEMO-3/4 — debug mode (desk demo)', () => {
     await page.evaluate(() => {
       const d = /** @type {any} */ (window).__boussoleDebug;
       let rem = null;
-      for (let i = 0; i < 400 && rem !== 0; i++) rem = d.tick(250);
+      for (let i = 0; i < 2000 && rem !== 0; i++) rem = d.tick(250); // ~216 m at 1.2 m/s
     });
     // poll the readout until the walked pose is reflected (interval-driven DOM)
+    const TARGET = { lat: 45.55923926291231, lon: -73.71763634643162 };
     let finalRo;
     await expect(async () => {
       finalRo = await readout(panel);
       const d = Math.hypot(
-        (finalRo.pose.lat - 45.55760) * 111320,
-        (finalRo.pose.lon - -73.71550) * 111320 * Math.cos(45.5577 * Math.PI / 180));
+        (finalRo.pose.lat - TARGET.lat) * 111320,
+        (finalRo.pose.lon - TARGET.lon) * 111320 * Math.cos(45.5577 * Math.PI / 180));
       expect(d).toBeLessThan(3); // DEMO-4: ≤3 m at capture
     }).toPass({ timeout: 10_000, intervals: [200] });
 
@@ -50,8 +51,8 @@ test.describe('DEMO-3/4 — debug mode (desk demo)', () => {
     // since the DOM live region refreshes on a throttled interval
     expect(finalRo.pose).not.toBeNull();
     const cadranM = Math.round(Math.hypot(
-      (finalRo.pose.lat - 45.55760) * 111320,
-      (finalRo.pose.lon - -73.71550) * 111320 * Math.cos(45.5577 * Math.PI / 180)));
+      (finalRo.pose.lat - TARGET.lat) * 111320,
+      (finalRo.pose.lon - TARGET.lon) * 111320 * Math.cos(45.5577 * Math.PI / 180)));
     expect(cadranM).toBeLessThan(20);
   });
 

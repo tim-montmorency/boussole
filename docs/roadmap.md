@@ -44,7 +44,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 207 unit + 23 e2e · tsc clean**
+**Test count: 209 unit + 23 e2e · tsc clean**
 
 ### Decisions made en route (Phase 5)
 - 2026-09-17 — Forge is Node (`tools/forge.mjs`) for M0; the Rust CLI (Phase 6) reimplements the same behaviour. CI can gate bundles today.
@@ -71,6 +71,8 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [x] **AR entry flow**: `#/ar` route, `<b-arprompt>` camera pre-prompt (PERM-1 second sheet), "Vue caméra" FAB; e2e covers prompt → AR view, denial → back to plan with no dead UI, and "Pas maintenant"
 - [x] **PLAN-2 heading-up**: pure rotation-mode logic (live/absolute heading only; stale >3 s, disturbed, or relative heading → north-up) applied to the plan canvas around the visitor dot
 - [ ] AR-7 WebXR flag (post-M0, gated on isSessionSupported)
+- [x] **Real destination**: r-atrium = 45.55923926291231, -73.71763634643162; bundle re-validated by forge
+- [x] **Far mode**: cadran shows km (1 decimal) beyond 1 km; AR keeps an edge chevron for out-of-range targets — bearing + distance work from anywhere on Earth, not just inside the venue
 - [ ] On-device: R3 FOV calibration UX, jsQR ancre scan in AR (AR-6 device pass)
 - [x] Ambiance presentation state (AMB-3/4): plan cards / AR billboards / audio crossfade plan / video play-pause plan — pure, DOM wiring pending Phase 4 views
 - [x] Debug panel (DEMO-3 UI): pose form, joystick+keys, walk-to-target, trace 1×/4×, live readout; `window.__boussoleDebug` exposed in debug mode for harnesses

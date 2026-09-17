@@ -29,8 +29,19 @@ describe('AR-2 marker projection', () => {
     const down = projectMarker(POSE, NORTH, { ...VIEW, pitchDeg: 20 });
     expect(down.y).toBeGreaterThan(level.y);
   });
-  it('beyond arRange → not visible', () => {
-    expect(projectMarker(POSE, FAR, VIEW).visible).toBe(false);
+  it('beyond arRange → far-mode chevron at the edge (works from anywhere)', () => {
+    const m = projectMarker(POSE, FAR, VIEW);
+    expect(m.visible).toBe(true);
+    expect(m.far).toBe(true);
+    expect(m.chevron).toBe('right'); // delta 0 (dead ahead) → right by convention
+    expect(m.tappable).toBe(false);
+  });
+  it('far-mode chevron side follows the bearing delta sign', () => {
+    // target due east, heading north → delta +90 → right edge
+    const east = projectMarker(POSE, { lat: 45.56, lon: -73.70 }, VIEW); // ~1.4 km east
+    expect(east.far).toBe(true);
+    expect(east.chevron).toBe('right');
+    expect(east.x).toBe(VIEW.w - 16);
   });
   it('calibrated hFOV changes the projection (in-FOV marker)', () => {
     const wide = projectMarker(POSE, NE20, { ...VIEW, hFov: 80 });
@@ -68,11 +79,12 @@ describe('AR-4/5 size, opacity, capture', () => {
 });
 
 describe('arMarkers batch', () => {
-  it('filters to arRange and sorts far→near for paint order', () => {
+  it('far markers included (edge chevrons), sorted far→near for paint order', () => {
     const repères = [
       { ...NORTH, id: 'n' }, { ...EAST, id: 'e' }, { ...FAR, id: 'f' },
     ];
     const ms = arMarkers(POSE, repères, VIEW);
-    expect(ms.map((m) => m.id)).toEqual(['e', 'n']); // far one out of range
+    expect(ms.map((m) => m.id)).toEqual(['f', 'e', 'n']); // far first (painted under)
+    expect(ms.find((m) => m.id === 'f').far).toBe(true);
   });
 });

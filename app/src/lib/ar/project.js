@@ -14,13 +14,18 @@ import { angDiffDeg } from '../geometry/circular.js';
  */
 export function projectMarker(pose, target, view) {
   const distanceM = haversineM(pose, target);
-  if (distanceM > view.arRange) {
-    return { id: target.id, visible: false, distanceM, x: 0, y: 0, size: 0, opacity: 0,
-      tappable: false, chevron: null };
-  }
   const bearing = bearingDeg(pose, target);
   const delta = angDiffDeg(pose.heading ?? 0, bearing); // signed, (-180, 180]
   const halfFov = view.hFov / 2;
+
+  // Far mode (works from anywhere): out of arRange → a chevron at the FOV
+  // edge pointing toward the target, labelled in km. Never tappable.
+  if (distanceM > view.arRange) {
+    const side = delta >= 0 ? 'right' : 'left';
+    return { id: target.id, visible: true, far: true, distanceM,
+      x: side === 'left' ? 16 : view.w - 16, y: view.h / 2, size: 28,
+      opacity: 0.6, tappable: false, chevron: side };
+  }
 
   // AR-3: outside the FOV → edge chevron pointing the way
   const chevron = delta > halfFov ? 'right' : delta < -halfFov ? 'left' : null;
