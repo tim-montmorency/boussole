@@ -44,7 +44,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 119 unit + 6 e2e · tsc clean**
+**Test count: 136 unit + 9 e2e · tsc clean**
 
 ### Decisions made en route (Phase 3)
 - 2026-09-17 — `ctx` (shared app context) typed as `any`: it is the DOM-glue boundary; strict typing stays in `src/lib/`.
@@ -56,12 +56,20 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] 🚫 R2: `deviceorientationabsolute` device matrix
 - [ ] 🚫 R3: FOV calibration feasibility
 - [ ] 🚫 R11: audio unlock recipe verified on device
+- [x] Step detection DSP (POS-3): Butterworth 1–3 Hz band-pass (RBJ biquads), local-max peak picking, median-of-confirmed adaptive threshold, 300 ms refractory, interval + cadence-consistency gates
 - [ ] Sensor shells: geolocation (PERM-4), orientation/motion (PERM-2), camera (PERM-3) + wake lock (AR-8), audio unlock (PERM-7/8), haptics (CAD-3)
 - [ ] Cadran SVG HUD (CAD-1..4)
 - [ ] AR overlay (AR-1..8) incl. jsQR ESM wrapper
-- [ ] Ambiance presentation (AMB-1/3/4 rendering) — owns DEMO-4 media playback
-- [ ] Debug panel (DEMO-3 UI)
+- [x] Ambiance presentation state (AMB-3/4): plan cards / AR billboards / audio crossfade plan / video play-pause plan — pure, DOM wiring pending Phase 4 views
+- [x] Debug panel (DEMO-3 UI): pose form, joystick+keys, walk-to-target, trace 1×/4×, live readout; `window.__boussoleDebug` exposed in debug mode for harnesses
+- [x] E2e desk half of DEMO-4: walk-to-target converges ≤3 m (stable over 4 consecutive runs)
 - [ ] Playwright denial matrix (Chromium) + `docs/device-checklist.md` for iOS
+
+### Decisions made en route (Phase 4 so far)
+- 2026-09-17 — POS-3 threshold is seeded only by gait-confirmed peaks: the filter warmup transient is indistinguishable from a first step and must never raise the adaptive threshold (hard-won: warmup spike 5.6 vs gait 2.7 m/s²).
+- 2026-09-17 — Cadence gate: after 3 established intervals, a step must fall within ±50% of the median interval (kills 5 Hz alias rhythms).
+- 2026-09-17 — Headless Chromium throttles background timers: e2e drives the sim via `window.__boussoleDebug.tick()`; UI tests assert on model state, not interval-driven DOM text.
+- 2026-09-17 — Custom-element re-render pattern: parent sets `.ctx` then calls `_start()`/`render()` only if the element didn't self-initialize on connection (double-listener bug fixed).
 
 ## Phase 5 — PWA + venue (M0 gate)
 - [ ] Forge minimal: `validate` + `hash` subcommands (pulled ahead)

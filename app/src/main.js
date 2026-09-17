@@ -12,6 +12,7 @@ import { idbStore } from './lib/store/idb.js';
 import { loadCarnet, saveCarnet } from './lib/store/carnet.js';
 import { computeTier } from './lib/tiers.js';
 import { enuFrame } from './lib/geometry/geo.js';
+import { createDebugSession } from './lib/debug/session.js';
 import './components/b-app.js';
 
 const params = new URLSearchParams(location.search);
@@ -96,6 +97,14 @@ async function boot() {
     const ancre = (bundle.ancres ?? []).find((/** @type {any} */ x) => x.id === ancreId);
     if (ancre && !fusion.pose.value) {
       fusion.handleFix({ kind: 'ancre', lat: ancre.lat, lon: ancre.lon, accuracy: 1, t: Date.now() });
+    }
+
+    // DEMO-3: debug mode via ?debug=1 — SimPositionSource drives fusion.
+    if (params.get('debug') === '1') {
+      ctx.debug = createDebugSession(fusion);
+      ctx.debugEnabled = true;
+      // exposed for e2e/device harnesses (never present in normal operation)
+      /** @type {any} */ (window).__boussoleDebug = ctx.debug;
     }
   }
 

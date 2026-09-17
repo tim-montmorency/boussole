@@ -6,6 +6,8 @@
 import { BElement, esc } from './base.js';
 import { createViewport } from '../lib/plan/viewport.js';
 import { pickLocalized } from '../lib/content/localize.js';
+import { haversineM, bearingDeg } from '../lib/geometry/geo.js';
+import './b-debug.js';
 
 export class BPlan extends BElement {
   connectedCallback() {
@@ -14,14 +16,37 @@ export class BPlan extends BElement {
     this.render();
   }
   render() {
+    if (!this.ctx) return; // parsed before ctx assignment
     const { t } = this.ctx.i18n;
     this.html(`
       <section class="plan-wrap">
         <canvas aria-hidden="true"></canvas>
         <p class="hint">${t('plan.setPosition')}</p>
         <p class="pos-label">${this.posLabel()}</p>
+        <p class="cadran-live sr-only" role="status">${this.cadranText()}</p>
+        ${this.ctx.debugEnabled ? '<b-debug></b-debug>' : ''}
       </section>`);
+    const dbg = this.querySelector('b-debug');
+    if (dbg && !/** @type {any} */ (dbg).ctx) {
+      /** @type {any} */ (dbg).ctx = this.ctx;
+      /** @type {any} */ (dbg)._start();
+    }
     this.setupCanvas(/** @type {HTMLCanvasElement} */ (this.querySelector('canvas')));
+    // keep the live cadran text and position label fresh
+    this._offs.push(this.ctx.pose.subscribe(() => {
+      const live = this.querySelector('.cadran-live');
+      if (live) live.textContent = this.cadranText();
+      const lbl = this.querySelector('.pos-label');
+      if (lbl) lbl.textContent = this.posLabel();
+    }));
+  }
+  /** A11Y-3: the cadran's state as text, throttled by the live region. */
+  cadranText() {
+    const p = this.ctx.pose.value;
+    const target = this.ctx.bundle?.reperes?.[0];
+    if (!p || !target) return '';
+    const { t } = this.ctx.i18n;
+    return `${t('repere.distance', { d: Math.round(haversineM(p, target)) })} · ${t('repere.bearing', { b: Math.round(bearingDeg(p, target)) })}`;
   }
   posLabel() {
     const { t } = this.ctx.i18n;

@@ -36,9 +36,9 @@ export class BApp extends BElement {
         ${['plan', 'list', 'carnet', 'settings'].map((n) => `
           <button class="nav" data-route="${n}" aria-current="${r.name === n}">${t(`nav.${n}`)}</button>`).join('')}
       </nav>`);
-    const view = /** @type {BElement} */ (this.querySelector('#view'));
+    const view = /** @type {any} */ (this.querySelector('#view'));
     view.ctx = this.ctx;
-    view.connectedCallback();
+    view.render(); // connectedCallback only fires when not yet connected; render directly
     this.querySelectorAll('.nav').forEach((b) => b.addEventListener('click', () => {
       this.ctx.router.go(/** @type {HTMLElement} */ (b).dataset.route);
     }));
