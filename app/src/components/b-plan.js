@@ -5,6 +5,9 @@
  */
 import { BElement, esc } from './base.js';
 import { createViewport } from '../lib/plan/viewport.js';
+import { createBasemapRegistry, createLayerStack } from '../lib/plan/layers.js';
+import { visibleTiles, tileRectInPlanPx } from '../lib/plan/draw.js';
+import { zoomForSpan } from '../lib/plan/tiles.js';
 import { pickLocalized } from '../lib/content/localize.js';
 import { haversineM, bearingDeg } from '../lib/geometry/geo.js';
 import './b-debug.js';
@@ -64,25 +67,69 @@ export class BPlan extends BElement {
     const vp = createViewport({ worldW: bundle.plan.width, worldH: bundle.plan.height,
       screenW: rect.width, screenH: rect.height });
     const g = canvas.getContext('2d');
+    // PLAN-5..8: layer stack (basemap + venue overlays beneath the plan)
+    const stack = createLayerStack(bundle, createBasemapRegistry());
+    /** @type {Map<string, HTMLImageElement>} */ const imgCache = new Map();
+    /** @param {string} src @param {() => void} onload */
+    const img = (src, onload) => {
+      if (!imgCache.has(src)) {
+        const im = new Image();
+        im.crossOrigin = 'anonymous';
+        im.onload = onload;
+        im.src = src;
+        imgCache.set(src, im);
+      }
+      const im = imgCache.get(src);
+      return im && im.complete && im.naturalWidth > 0 ? im : null;
+    };
 
     const draw = () => {
       if (!g) return;
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       g.clearRect(0, 0, rect.width, rect.height);
-      // plan placeholder grid (image loads async; PLAN-1 raster lands in Phase 5)
       g.save();
-      g.transform(1, 0, 0, 1, 0, 0);
       const tl = vp.toScreen(0, 0), br = vp.toScreen(bundle.plan.width, bundle.plan.height);
-      g.fillStyle = '#1b232c'; g.fillRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
-      g.strokeStyle = '#2c3947';
-      for (let x = 0; x <= bundle.plan.width; x += 256) {
-        const a = vp.toScreen(x, 0), b = vp.toScreen(x, bundle.plan.height);
-        g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
+
+      for (const layer of stack.layers()) {
+        g.globalAlpha = layer.opacity;
+        if (layer.kind === 'basemap') {
+          // visible lat/lon bounds of the current viewport → covering tiles
+          const nw = geoRef.forward(vp.toWorld(0, 0).x, vp.toWorld(0, 0).y);
+          const se = geoRef.forward(vp.toWorld(rect.width, rect.height).x, vp.toWorld(rect.width, rect.height).y);
+          const z = zoomForSpan(this.ctx.mPerPx * bundle.plan.width / 2, bundle.origin.lat);
+          for (const t of visibleTiles({ north: nw.lat, south: se.lat, west: nw.lon, east: se.lon }, z, layer.source.maxZoom)) {
+            const url = layer.source.tileUrl(t.z, t.x, t.y);
+            if (!url) continue;
+            const r = tileRectInPlanPx(geoRef, t.x, t.y, t.z);
+            const s0 = vp.toScreen(r.x, r.y);
+            const w = r.w * vp.scale, h = r.h * vp.scale;
+            const tile = img(url, draw);
+            if (tile) g.drawImage(tile, s0.x, s0.y, w, h);
+            else { g.fillStyle = '#141a21'; g.fillRect(s0.x, s0.y, w, h); }
+          }
+        } else if (layer.kind === 'overlay') {
+          // venue-declared georeferenced image (PLAN-7), affine like the plan
+          const o = layer.overlay;
+          const cp0 = o.controlPoints[0];
+          const p0 = geoRef.inverse(cp0.lat, cp0.lon);
+          const s = vp.toScreen(p0.px - cp0.px, p0.py - cp0.py);
+          const im = img(o.src, draw);
+          if (im) g.drawImage(im, s.x, s.y, im.naturalWidth * vp.scale, im.naturalHeight * vp.scale);
+        } else {
+          // venue plan (placeholder grid until the raster ships in Phase 5)
+          g.fillStyle = '#1b232c'; g.fillRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
+          g.strokeStyle = '#2c3947';
+          for (let x = 0; x <= bundle.plan.width; x += 256) {
+            const a = vp.toScreen(x, 0), b = vp.toScreen(x, bundle.plan.height);
+            g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
+          }
+          for (let y = 0; y <= bundle.plan.height; y += 256) {
+            const a = vp.toScreen(0, y), b = vp.toScreen(bundle.plan.width, y);
+            g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
+          }
+        }
       }
-      for (let y = 0; y <= bundle.plan.height; y += 256) {
-        const a = vp.toScreen(0, y), b = vp.toScreen(bundle.plan.width, y);
-        g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
-      }
+      g.globalAlpha = 1;
       // repère markers (discovered = filled)
       const encountered = this.ctx.carnet.value?.encountered ?? {};
       for (const r of bundle.reperes) {

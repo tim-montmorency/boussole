@@ -208,6 +208,15 @@ Position sources are plugins (see ARCH-2). v1 ships web-standard sources only, s
 - **PLAN-3** Markers: repères (discovered vs. not), ancres, visitor dot + accuracy circle, selected target line.
 - **PLAN-4** Tiles are not needed at v1 (single image). If a venue exceeds 4096 px, the authoring tool slices into a 2-level pyramid stored in the bundle.
 
+### 6.1 Base-map provider layer
+
+The venue plan can sit on top of a real-world basemap, so visitors can relate the building to the street outside. The layer is a plugin, not a dependency.
+
+- **PLAN-5** Basemap sources implement `BasemapSource = { id, label, attribution, tileUrl(z,x,y), minZoom, maxZoom, maxConcurrent }`. v1 ships `osm` (tile.openstreetmap.org, © OpenStreetMap contributors, ODbL) and `none`. Adding a provider (Thunderforest, MapTiler, a venue-hosted tile dir) is one object. No API-key-locked provider in the default build.
+- **PLAN-6** The basemap renders beneath the venue plan on the same canvas: Web-Mercator (EPSG:3857) slippy tiles, drawn in the plan's ENU pixel space via the georeference, with the venue plan image/composite on top at configurable opacity (default 0.85). Tile fetches are capped (≤6 concurrent) and aborted when stale.
+- **PLAN-7** Custom overlays: a venue may declare georeferenced overlay images (`overlays:` in venue.json — 3+ control points each, same affine fit as PLAN-1) rendered between basemap and plan, each with `opacity` and optional `visible` toggle in settings. Use cases: historical aerial photo, artist layer, evacuation map.
+- **PLAN-8** Privacy/offline reconciliation: the basemap is the **only** runtime third-party traffic, it is **off by default** (opt-in per venue, `defaults.basemap: "osm" | "none"`, default `none`), and enabling it relaxes CSP `img-src`/`connect-src` to the tile origin only, declared per deployment. With `basemap: "none"` or offline, the layer is simply absent — tiles already in the service-worker cache (256 LRU) keep working in airplane mode. No coordinate ever goes to the tile server beyond what tile URLs inherently disclose (z/x/y ≈ area, not the visitor); the viewport is snapped to tile bounds, not to the pose.
+
 Cadran HUD (fr. *dial*):
 
 - **CAD-1** Rose rotates with heading; target arrow shows bearing delta; centre shows distance (m, 1 decimal under 10 m).
@@ -335,7 +344,7 @@ interface CarnetState {
 - **PRIV-2** Camera frames are drawn to canvas only for QR detection and never stored.
 - **PRIV-3** Position history is not kept beyond `lastPose`.
 - **PRIV-4** A one-tap "Tout effacer" removes IndexedDB, caches and permission flags.
-- **OFF-1** Service worker precaches app shell; venue bundle cached on first visit; the app is installable (`manifest.webmanifest`, `display: standalone`).
+- **OFF-1** Service worker precaches app shell; venue bundle cached on first visit; the app is installable (`manifest.webmanifest`, `display: standalone`). Basemap tiles (when enabled, PLAN-8) are cached lazily in a 256-tile LRU.
 - **OFF-2** First load over the venue LAN from a Pi (`kioskd`-style static server) is supported; the QR at the entrance can point to a `.local` mDNS name.
 - **SEC-1** Strict CSP, no inline scripts, no third-party origins, SRI not needed (no CDN).
 - **SEC-2** Foreign-origin bundles (`?venue=` pointing at another origin) are out of v1 scope: they would require both CORS and a per-deployment CSP relaxation of `connect-src`. Content is always treated as data (sanitized text rendering, no HTML in content fields), whatever the origin.
@@ -436,6 +445,7 @@ Decided 2026-09-17:
 
 - Stack: no build step, pure JS — native ES modules + Web Components; Svelte/Vite dropped; JSDoc + `tsc --checkJs` replaces TypeScript compilation; validation and IndexedDB access are hand-rolled to keep zero runtime dependencies.
 - T3 requires camera + any live pose, not T2; ancre and manual poses qualify (§2).
+- Basemap layer: plugin sources (OSM default-off), rendered under the plan in ENU space; venue-declared georeferenced overlay images between basemap and plan; only runtime third-party traffic, opt-in per venue (PLAN-5..8).
 - Pre-prompt gains a "Boussole seule" action (orientation + motion only) so T1 with live heading never triggers a location prompt (PERM-9).
 - iOS motion permission is requested in the same gesture as orientation; DR silently degrades without it (PERM-2).
 - Venue bundles are same-origin only in v1; foreign origins deferred until the CSP story is designed (PRIV-1, SEC-2).
@@ -449,3 +459,4 @@ Open:
 - [ ] Accept a purely metric local plan (origin + rotation + scale) as an alternative to georeferenced control points for sites without GPS-friendly plans?
 - [ ] Video loop codec policy: WebM/VP9 only, or also ship H.264 MP4 for older iOS?
 - [ ] Which non-standard source first for M6: Web Bluetooth beacons, or a venue-side positioning feed over WebSocket/mDNS?
+- [ ] Basemap: worth shipping an offline raster tile pack for the venue neighbourhood in `venues/*/tiles/` for fully-offline street context (PLAN-8)?

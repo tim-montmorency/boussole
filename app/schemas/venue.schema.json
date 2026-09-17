@@ -77,7 +77,35 @@
         "revealRadius": { "type": "number" },
         "arRange": { "type": "number" },
         "strideLength": { "type": "number" },
-        "planMode": { "enum": ["north-up", "heading-up"] }
+        "planMode": { "enum": ["north-up", "heading-up"] },
+        "basemap": { "type": "string" },
+        "planOpacity": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "overlays": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "src", "controlPoints"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "src": { "type": "string" },
+          "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+          "visible": { "type": "boolean" },
+          "controlPoints": {
+            "type": "array", "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["px", "py", "lat", "lon"],
+              "additionalProperties": false,
+              "properties": {
+                "px": { "type": "number" }, "py": { "type": "number" },
+                "lat": { "type": "number" }, "lon": { "type": "number" }
+              }
+            }
+          }
+        }
       }
     },
     "debug": {

@@ -44,7 +44,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 136 unit + 9 e2e · tsc clean**
+**Test count: 154 unit + 11 e2e · tsc clean**
 
 ### Decisions made en route (Phase 3)
 - 2026-09-17 — `ctx` (shared app context) typed as `any`: it is the DOM-glue boundary; strict typing stays in `src/lib/`.
@@ -57,6 +57,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] 🚫 R3: FOV calibration feasibility
 - [ ] 🚫 R11: audio unlock recipe verified on device
 - [x] Step detection DSP (POS-3): Butterworth 1–3 Hz band-pass (RBJ biquads), local-max peak picking, median-of-confirmed adaptive threshold, 300 ms refractory, interval + cadence-consistency gates
+- [x] **Map provider layer (PLAN-5..8)**: `BasemapSource` registry (osm + none; custom = one object), Web-Mercator tile math, visible-tile + tile→plan-px projection, layer stack (basemap → venue overlays → plan), canvas rendering in `<b-plan>`, schema support for `overlays` + `basemap` default, e2e (no third-party traffic by default)
 - [ ] Sensor shells: geolocation (PERM-4), orientation/motion (PERM-2), camera (PERM-3) + wake lock (AR-8), audio unlock (PERM-7/8), haptics (CAD-3)
 - [ ] Cadran SVG HUD (CAD-1..4)
 - [ ] AR overlay (AR-1..8) incl. jsQR ESM wrapper
@@ -70,6 +71,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - 2026-09-17 — Cadence gate: after 3 established intervals, a step must fall within ±50% of the median interval (kills 5 Hz alias rhythms).
 - 2026-09-17 — Headless Chromium throttles background timers: e2e drives the sim via `window.__boussoleDebug.tick()`; UI tests assert on model state, not interval-driven DOM text.
 - 2026-09-17 — Custom-element re-render pattern: parent sets `.ctx` then calls `_start()`/`render()` only if the element didn't self-initialize on connection (double-listener bug fixed).
+- 2026-09-17 — Basemap layer spec'd as PLAN-5..8: opt-in per venue (`none` default keeps PRIV-1 true), OSM only shipped provider, venue-declared georeferenced overlay images between basemap and plan, tile URLs snapped to viewport bounds (never pose).
 
 ## Phase 5 — PWA + venue (M0 gate)
 - [ ] Forge minimal: `validate` + `hash` subcommands (pulled ahead)

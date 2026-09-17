@@ -94,7 +94,7 @@ In dependency order, each module = pure TS + vitest:
 
 ## Post-M0 stubs (own plans later)
 
-- **M1 — Plan complet:** repère search (T0), offline hardening remainder.
+- **M1 — Plan complet:** repère search (T0), offline hardening remainder, basemap settings UI (provider picker, overlay toggles, PLAN-8 attribution display).
 - **M2 — Position:** DR tuning against device traces, multiple ancres, accuracy UI polish.
 - **M3 — Ambiance:** zones, parcours progression, full tableau catalogue; PERF-3 thermal acceptance.
 - **M4 — Parcours & carnet:** export/import UI (AMB-8), completion rules (open question in §13).

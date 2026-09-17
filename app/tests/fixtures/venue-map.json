@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "map-test",
+  "name": "Map layer test venue",
+  "lang": ["fr"],
+  "origin": { "lat": 45.5577, "lon": -73.7157 },
+  "plan": {
+    "src": "plan.webp",
+    "width": 4096,
+    "height": 2731,
+    "controlPoints": [
+      { "px": 120, "py": 90, "lat": 45.55790, "lon": -73.71620 },
+      { "px": 3980, "py": 110, "lat": 45.55788, "lon": -73.71480 },
+      { "px": 3970, "py": 2640, "lat": 45.55720, "lon": -73.71482 }
+    ]
+  },
+  "defaults": { "captureRadius": 4, "revealRadius": 25, "arRange": 60, "basemap": "testtiles", "planOpacity": 0.85 },
+  "overlays": [
+    { "id": "ov-test", "src": "tests/fixtures/overlay.png", "opacity": 0.7, "visible": true,
+      "controlPoints": [{ "px": 0, "py": 0, "lat": 45.5580, "lon": -73.7160 }] }
+  ],
+  "reperes": [
+    { "id": "r1", "lat": 45.5576, "lon": -73.7155, "name": { "fr": "Cible" } }
+  ]
+}
