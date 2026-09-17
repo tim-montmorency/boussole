@@ -30,11 +30,10 @@ test.describe('DEMO-3/4 — debug mode (desk demo)', () => {
     // Chromium throttles background timers, so the panel's interval can't be
     // trusted to advance the walk.
     await panel.locator('#dbg-target').selectOption('r-studios');
-    await panel.getByRole('button', { name: 'walk to target' }).click();
     await page.evaluate(() => {
-      const d = /** @type {any} */ (window).__boussoleDebug;
-      let rem = null;
-      for (let i = 0; i < 2000 && rem !== 0; i++) rem = d.tick(250); // ~216 m at 1.2 m/s
+      // quiet fast-forward: one fusion emit, no per-tick UI storm
+      /** @type {any} */ (window).__boussoleDebug.walkToEnd(
+        window.__ctx.bundle.reperes.find((r) => r.id === 'r-studios'));
     });
     // poll the readout until the walked pose is reflected (interval-driven DOM)
     const TARGET = { lat: 45.55923926291231, lon: -73.71763634643162 };

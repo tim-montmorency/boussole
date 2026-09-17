@@ -76,8 +76,26 @@ export function createSimSource({
       emitFix(); emitHeading();
       return dist - step;
     },
+    /** Fast-forward to the walk target with NO per-step emissions (self-test
+     * safe: the per-step fusion emits × N ticks would storm the UI). Returns
+     * remaining metres (0 on arrival), then emits ONE final fix + heading. */
+    walkToEnd() {
+      if (!walking) return null;
+      const { target } = walking;
+      heading = (bearingTo(target) + 360) % 360;
+      lat = target.lat; lon = target.lon; walking = null;
+      emitFix(); emitHeading();
+      return 0;
+    },
     get position() { return { lat, lon, heading, accuracy }; },
   };
+  /** @param {{ lat: number, lon: number }} t */
+  function bearingTo(t) {
+    const f = enuFrame({ lat, lon });
+    const v = f.toENU({ lat, lon });
+    const tv = f.toENU(t);
+    return Math.atan2(tv.e - v.e, tv.n - v.n) * 180 / Math.PI;
+  }
   return source;
 }
 

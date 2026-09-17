@@ -44,7 +44,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 212 unit + 23 e2e · tsc clean**
+**Test count: 212 unit + 26 e2e · tsc clean**
 
 ### Decisions made en route (Phase 5)
 - 2026-09-17 — Forge is Node (`tools/forge.mjs`) for M0; the Rust CLI (Phase 6) reimplements the same behaviour. CI can gate bundles today.
@@ -85,6 +85,8 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - 2026-09-17 — Headless Chromium throttles background timers: e2e drives the sim via `window.__boussoleDebug.tick()`; UI tests assert on model state, not interval-driven DOM text.
 - 2026-09-17 — Custom-element re-render pattern: parent sets `.ctx` then calls `_start()`/`render()` only if the element didn't self-initialize on connection (double-listener bug fixed).
 - 2026-09-17 — Basemap layer spec'd as PLAN-5..8: opt-in per venue (`none` default keeps PRIV-1 true), OSM only shipped provider, venue-declared georeferenced overlay images between basemap and plan, tile URLs snapped to viewport bounds (never pose).
+- 2026-09-17 — Custom-element lifecycle: `connectedCallback` runs before the parent assigns `ctx`; subscriptions that need ctx live in `bind()`, called by the parent. (Root cause of two field bugs.)
+- 2026-09-17 — Debug self-test uses `walkToEnd` (single fusion emit); driving hundreds of UI-emitting ticks synchronously crashes the renderer (headless Chromium tab crash at ~400).
 
 ## Phase 5 — PWA + venue (M0 gate)
 - [x] **Forge `validate` + `hash`** (`tools/forge.mjs`): schema validation, media sha256 verify/write, georeference residual report — reference implementation for the Rust CLI (Phase 6)

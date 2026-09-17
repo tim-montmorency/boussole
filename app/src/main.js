@@ -107,13 +107,18 @@ async function boot() {
       fusion.handleFix({ kind: 'ancre', lat: ancre.lat, lon: ancre.lon, accuracy: 1, t: Date.now() });
     }
 
-    // DEMO-3: debug mode via ?debug=1 — SimPositionSource drives fusion.
-    if (params.get('debug') === '1') {
-      ctx.debug = createDebugSession(fusion);
-      ctx.debugEnabled = true;
-      // exposed for e2e/device harnesses (never present in normal operation)
-      /** @type {any} */ (window).__boussoleDebug = ctx.debug;
-    }
+    // DEMO-3: debug mode — ?debug=1, 5-tap on the version label, or the 🐛
+    // FAB. The session always exists so a real phone can collect field data
+    // without ever typing a query string; the overlay just shows/hides.
+    ctx.debug = createDebugSession(fusion);
+    ctx.debugEnabled = observable(params.get('debug') === '1'
+      || localStorage.getItem('boussole:debug') === '1');
+    ctx.toggleDebug = () => {
+      const next = !ctx.debugEnabled.value;
+      ctx.debugEnabled.set(next);
+      localStorage.setItem('boussole:debug', next ? '1' : '0');
+    };
+    /** @type {any} */ (window).__boussoleDebug = ctx.debug;
 
     // Sensor shells (PERM-*): created lazily, started only from user gestures.
     const geo = createGeoShell({ geo: navigator.geolocation, doc: document });

@@ -32,11 +32,13 @@ export class BDebug extends BElement {
     this.ctx.debug.tick(100);
     const r = this.querySelector('#dbg-readout');
     if (r) {
-      r.textContent = JSON.stringify(this.ctx.debug.readout({
-        planMode: this.ctx.carnet.value?.planMode ?? 'north-up',
-        perms: this.ctx.perms.value,
-        audioUnlocked: this.ctx.carnet.value?.audioUnlocked ?? false,
-      }), null, 1);
+      try {
+        r.textContent = JSON.stringify(this.ctx.debug.readout({
+          planMode: this.ctx.carnet?.value?.planMode ?? 'north-up',
+          perms: this.ctx.perms?.value ?? {},
+          audioUnlocked: this.ctx.carnet?.value?.audioUnlocked ?? false,
+        }), null, 1);
+      } catch { /* pose not ready yet */ }
     }
   }
 
@@ -79,7 +81,7 @@ export class BDebug extends BElement {
           <button id="dbg-play1">1×</button>
           <button id="dbg-play4">4×</button>
         </div>
-        <button id="dbg-runtest">${this.ctx.i18n.t('debug.runTest')}</button>
+        <button id="dbg-runtest" class="dbg-copy">📋 ${this.ctx.i18n.t('debug.runTest')}</button>
         <pre id="dbg-readout"></pre>
       </section>`);
     // Self-test: walk to the current target, then copy a full field log to
@@ -88,9 +90,8 @@ export class BDebug extends BElement {
       const btn = /** @type {HTMLButtonElement} */ (e.target);
       const target = this.ctx.bundle.reperes.find((/** @type {any} */ r) =>
         r.id === (this.ctx.targetId?.value ?? 'r-studios')) ?? this.ctx.bundle.reperes[0];
-      this.ctx.debug.walkTo(target);
-      let rem = null;
-      for (let i = 0; i < 2000 && rem !== 0; i++) rem = this.ctx.debug.tick(250);
+      // quiet fast-forward — one fusion emit, no per-tick UI storm
+      const rem = this.ctx.debug.walkToEnd(target);
       const log = collectFieldLog({
         ua: navigator.userAgent,
         bundle: this.ctx.bundle,
@@ -107,14 +108,14 @@ export class BDebug extends BElement {
       });
       try {
         await navigator.clipboard.writeText(formatFieldLog(log));
-        btn.textContent = this.ctx.i18n.t('debug.copied');
+        btn.textContent = '📋 ' + this.ctx.i18n.t('debug.copied');
       } catch {
         // clipboard needs a gesture/permission on some browsers — show the log inline
         const r = this.querySelector('#dbg-readout');
         if (r) r.textContent = formatFieldLog(log);
-        btn.textContent = '⚠ clipboard';
+        btn.textContent = '📋 ⚠';
       }
-      setTimeout(() => { btn.textContent = this.ctx.i18n.t('debug.runTest'); }, 2000);
+      setTimeout(() => { btn.textContent = '📋 ' + this.ctx.i18n.t('debug.runTest'); }, 2000);
     });
     this.querySelector('#dbg-pose')?.addEventListener('submit', (e) => {
       e.preventDefault();

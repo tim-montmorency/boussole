@@ -15,9 +15,12 @@ import './b-debug.js';
 import './b-cadran.js';
 
 export class BPlan extends BElement {
-  connectedCallback() {
+  bind() {
+    if (this._bound) return;
+    this._bound = true;
     this.track(this.ctx.pose);
     this.track(this.ctx.carnet);
+    if (this.ctx.debugEnabled) this.track(this.ctx.debugEnabled);
     this.render();
   }
   render() {
@@ -32,10 +35,12 @@ export class BPlan extends BElement {
         <div class="cadran-dock"><b-cadran></b-cadran></div>
         <button class="fab guide">${t('guide.cta')}</button>
         <button class="fab ar">${t('ar.cta')}</button>
-        ${this.ctx.debugEnabled ? '<b-debug></b-debug>' : ''}
+        <button class="fab dbg-toggle" aria-label="debug">🐛</button>
+        ${this.ctx.debugEnabled?.value ? '<b-debug></b-debug>' : ''}
       </section>`);
     this.querySelector('.fab.guide')?.addEventListener('click', () => this.ctx.showGuide?.());
     this.querySelector('.fab.ar')?.addEventListener('click', () => this.ctx.showAr?.());
+    this.querySelector('.dbg-toggle')?.addEventListener('click', () => this.ctx.toggleDebug?.());
     const dbg = this.querySelector('b-debug');
     if (dbg && !/** @type {any} */ (dbg).ctx) {
       /** @type {any} */ (dbg).ctx = this.ctx;

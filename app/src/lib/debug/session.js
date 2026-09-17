@@ -42,6 +42,14 @@ export function createDebugSession(fusion, { now = () => Date.now() } = {}) {
     rotate(deg) { sim?.rotate(deg); },
     /** @param {{ lat: number, lon: number }} target */
     walkTo(target) { sim?.walkTo(target); },
+    /** Fast-forward to the target with NO per-step fusion emissions (UI-safe
+     * self-test): jumps the sim, then emits one final fix + heading.
+     * @param {{ lat: number, lon: number }} target */
+    walkToEnd(target) {
+      if (!sim) return null;
+      sim.walkTo(target);
+      return sim.walkToEnd();
+    },
     /** Advance sim walking + trace playback by dtMs of wall time.
      * @param {number} dtMs */
     tick(dtMs) {

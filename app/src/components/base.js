@@ -25,6 +25,8 @@ export class BElement extends HTMLElement {
     /** @type {(() => void)[]} */ this._offs = [];
   }
   connectedCallback() { this.render(); }
+  /** Called by the parent after ctx is assigned — subscriptions go here. */
+  bind() {}
   disconnectedCallback() { this._offs.forEach((f) => f()); this._offs = []; }
   /** Subscribe for the element's lifetime. @param {any} store */
   track(store) {

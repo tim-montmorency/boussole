@@ -39,7 +39,8 @@ export class BApp extends BElement {
       </nav>`);
     const view = /** @type {any} */ (this.querySelector('#view'));
     view.ctx = this.ctx;
-    view.render(); // connectedCallback only fires when not yet connected; render directly
+    view.bind();   // subscriptions need ctx — connectedCallback ran before it
+    view.render();
     this.querySelectorAll('.nav').forEach((b) => b.addEventListener('click', () => {
       this.ctx.router.go(/** @type {HTMLElement} */ (b).dataset.route);
     }));

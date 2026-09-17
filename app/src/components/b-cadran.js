@@ -10,6 +10,7 @@ const RING_COLOUR = { hot: '#57d98e', warm: '#e8b93e', cold: '#58a0ff', none: '#
 
 export class BCadran extends BElement {
   connectedCallback() {
+    if (!this.ctx) return; // parsed before ctx assignment — parent re-renders
     this.track(this.ctx.pose);
     if (this.ctx.targetId) this.track(this.ctx.targetId);
     this.render();
@@ -22,6 +23,13 @@ export class BCadran extends BElement {
     const target = repères.find((/** @type {any} */ r) => r.id === this.ctx.targetId?.value)
       ?? repères.find((/** @type {any} */ r) => !r.hidden) ?? null;
     const s = cadranState(this.ctx.pose.value, target);
+    // re-render only on meaningful change (the SVG carries a live <animate> —
+    // rebuilding it per pose emission starves the main thread)
+    /** @type {string} */ (this._lastKey);
+    const key = JSON.stringify([s.bearingDelta?.toFixed(0), s.distanceText,
+      s.ring.band, s.label, s.arrowDimmed]);
+    if (key === this._lastKey) return;
+    /** @type {string} */ (this._lastKey = key);
     if (s.haptic && 'vibrate' in navigator) {
       navigator.vibrate(s.haptic.type === 'arrive' ? [80, 40, 80] : 30); // CAD-3
     }
