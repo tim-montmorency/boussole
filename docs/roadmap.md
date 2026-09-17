@@ -44,7 +44,11 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 190 unit + 16 e2e · tsc clean**
+**Test count: 190 unit + 17 e2e · tsc clean**
+
+### Decisions made en route (Phase 5)
+- 2026-09-17 — Forge is Node (`tools/forge.mjs`) for M0; the Rust CLI (Phase 6) reimplements the same behaviour. CI can gate bundles today.
+- 2026-09-17 — SW tile cache is offline-first (LRU 256); content is stale-while-revalidate; shell is cache-first with versioned swap on activate.
 
 ### Decisions made en route (Phase 3)
 - 2026-09-17 — `ctx` (shared app context) typed as `any`: it is the DOM-glue boundary; strict typing stays in `src/lib/`.
@@ -78,11 +82,13 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - 2026-09-17 — Basemap layer spec'd as PLAN-5..8: opt-in per venue (`none` default keeps PRIV-1 true), OSM only shipped provider, venue-declared georeferenced overlay images between basemap and plan, tile URLs snapped to viewport bounds (never pose).
 
 ## Phase 5 — PWA + venue (M0 gate)
-- [ ] Forge minimal: `validate` + `hash` subcommands (pulled ahead)
-- [ ] `tools/gen-precache.mjs` + full sw.js (OFF-1, DATA-3)
-- [ ] Montmorency pavillon A bundle + entrance QR (DEMO-1/2, PERM-6)
-- [ ] Offline e2e (OFF-1)
-- [ ] **M0 acceptance: DEMO-4 desk + on-site**
+- [x] **Forge `validate` + `hash`** (`tools/forge.mjs`): schema validation, media sha256 verify/write, georeference residual report — reference implementation for the Rust CLI (Phase 6)
+- [x] `tools/gen-precache.mjs` — regenerates the sw.js precache manifest (46 files)
+- [x] Full `sw.js`: precache shell, stale-while-revalidate content (ARCH-3), 256-tile LRU for basemap (PLAN-8)
+- [x] **Offline e2e (OFF-1)**: first load → airplane mode → plan/list/detail/check-in/carnet/settings all work (proven with SW-controlled reload)
+- [x] Example bundle media placeholders + real hashes
+- [ ] Montmorency pavillon A bundle: real georeferenced plan raster, real boucle + texte tableaux, entrance QR (DEMO-1/2) — needs venue assets
+- [ ] **M0 acceptance: DEMO-4 on-site** (needs devices + venue assets)
 
 ## Phase 6 — Forge full (post-M0)
 - [ ] `init`, `slice` (PLAN-4), `qr-sheet` PDF
