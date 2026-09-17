@@ -44,7 +44,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 200 unit + 20 e2e · tsc clean**
+**Test count: 207 unit + 23 e2e · tsc clean**
 
 ### Decisions made en route (Phase 5)
 - 2026-09-17 — Forge is Node (`tools/forge.mjs`) for M0; the Rust CLI (Phase 6) reimplements the same behaviour. CI can gate bundles today.
@@ -68,7 +68,10 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [x] `ctx.guide()` — the "Me guider" gesture chain wired in main.js (orientation prompts + geo watch + audio unlock in one tap), heartbeat for PERM-4; e2e covers T2 rise with mocked geolocation
 - [x] **AR overlay (AR-1..6, 8)**: projection math (bearing→x, pitch horizon, calibrated hFOV, edge chevrons, distance-scaled size/opacity, capture tappability) + `<b-ar>` component (video+canvas at DPR, PERF-1 unchanged-pose frame skip, AR-5 tap-to-capture, AR-8 wake lock). jsQR worker deferred to device pass (R8).
 - [x] **Pre-prompt sheets (PERM-1/9)**: `<b-preprompt>` with Continuer / Boussole seule / Pas maintenant; "Me guider" FAB on the plan; e2e proves dismissal makes no permission calls and compass-only never touches geolocation
+- [x] **AR entry flow**: `#/ar` route, `<b-arprompt>` camera pre-prompt (PERM-1 second sheet), "Vue caméra" FAB; e2e covers prompt → AR view, denial → back to plan with no dead UI, and "Pas maintenant"
+- [x] **PLAN-2 heading-up**: pure rotation-mode logic (live/absolute heading only; stale >3 s, disturbed, or relative heading → north-up) applied to the plan canvas around the visitor dot
 - [ ] AR-7 WebXR flag (post-M0, gated on isSessionSupported)
+- [ ] On-device: R3 FOV calibration UX, jsQR ancre scan in AR (AR-6 device pass)
 - [x] Ambiance presentation state (AMB-3/4): plan cards / AR billboards / audio crossfade plan / video play-pause plan — pure, DOM wiring pending Phase 4 views
 - [x] Debug panel (DEMO-3 UI): pose form, joystick+keys, walk-to-target, trace 1×/4×, live readout; `window.__boussoleDebug` exposed in debug mode for harnesses
 - [x] E2e desk half of DEMO-4: walk-to-target converges ≤3 m (stable over 4 consecutive runs)

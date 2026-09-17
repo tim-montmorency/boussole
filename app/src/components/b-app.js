@@ -9,8 +9,9 @@ import './b-list.js';
 import './b-repere.js';
 import './b-carnet.js';
 import './b-settings.js';
+import './b-ar.js';
 
-const VIEWS = { plan: 'b-plan', list: 'b-list', repere: 'b-repere', carnet: 'b-carnet', settings: 'b-settings' };
+const VIEWS = { plan: 'b-plan', list: 'b-list', repere: 'b-repere', carnet: 'b-carnet', settings: 'b-settings', ar: 'b-ar' };
 
 export class BApp extends BElement {
   connectedCallback() {

@@ -16,6 +16,8 @@ export const dicts = {
     'preprompt.body': 'Pour vous guider, boussole utilise :',
     'preprompt.audio': 'Son ambiant (rester sur l’appareil)',
     'preprompt.continue': 'Continuer',
+    'arprompt.body': 'La caméra reste sur l’appareil. Pointez vers un repère pour le découvrir.',
+    'arprompt.enable': 'Activer la caméra',
   },
   en: {
     'nav.plan': 'Map', 'nav.list': 'Landmarks', 'nav.carnet': 'Logbook', 'nav.settings': 'Settings',
@@ -33,5 +35,7 @@ export const dicts = {
     'preprompt.body': 'To guide you, boussole uses:',
     'preprompt.audio': 'Ambient sound (stays on-device)',
     'preprompt.continue': 'Continue',
+    'arprompt.body': 'The camera stays on-device. Point toward a landmark to discover it.',
+    'arprompt.enable': 'Enable camera',
   },
 };

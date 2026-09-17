@@ -16,8 +16,11 @@ import { createDebugSession } from './lib/debug/session.js';
 import { createGeoShell } from './lib/sensors/geo.js';
 import { createOrientationShell } from './lib/sensors/orientation.js';
 import { createAudioShell } from './lib/sensors/audio.js';
+import { createCameraShell } from './lib/sensors/camera.js';
+import { createWakeLockShell } from './lib/sensors/wakelock.js';
 import './components/b-app.js';
 import './components/b-preprompt.js';
+import './components/b-arprompt.js';
 
 const params = new URLSearchParams(location.search);
 const venueUrl = params.get('venue') ?? '../venues/example/venue.json';
@@ -127,6 +130,12 @@ async function boot() {
     });
     const audio = createAudioShell({ makeContext: () => new AudioContext() });
     ctx.sensors = { geo, orient, audio };
+    ctx.camera = createCameraShell({
+      getUserMedia: (c) => navigator.mediaDevices.getUserMedia(c),
+      doc: document,
+    });
+    ctx.sensors.wakelock = createWakeLockShell({
+      wakelock: /** @type {any} */ (navigator).wakeLock ?? null, doc: document });
 
     // "Me guider" gesture (PERM-1/2/7): one tap → orientation+motion prompts,
     // geolocation watch, audio unlock. Denials degrade silently (CAP-2/3).
@@ -162,6 +171,14 @@ async function boot() {
     ctx.showGuide = () => {
       if (document.querySelector('b-preprompt')) return;
       const sheet = /** @type {any} */ (document.createElement('b-preprompt'));
+      sheet.ctx = ctx;
+      document.body.append(sheet);
+      sheet.render();
+    };
+    // "Vue caméra" (AR entry): camera pre-prompt first, then #/ar (PERM-1)
+    ctx.showAr = () => {
+      if (document.querySelector('b-arprompt')) return;
+      const sheet = /** @type {any} */ (document.createElement('b-arprompt'));
       sheet.ctx = ctx;
       document.body.append(sheet);
       sheet.render();

@@ -17,8 +17,8 @@ export function parseHash(hash) {
     ? { name, params, query } : { name, params };
   if (seg.length === 0) return out('plan');
   if (seg[0] === 'repere' && seg[1]) return out('repere', { id: decodeURIComponent(seg[1]) });
-  if (['list', 'carnet', 'settings', 'plan'].includes(seg[0]) && seg.length === 1)
-    return out(seg[0]);
+  if (['list', 'carnet', 'settings', 'plan', 'ar'].includes(seg[0]) && seg.length === 1)
+    return out(/** @type {'plan'|'list'|'carnet'|'settings'|'ar'} */ (seg[0]));
   return out('plan');
 }
 

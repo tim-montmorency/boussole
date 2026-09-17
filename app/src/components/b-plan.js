@@ -10,6 +10,7 @@ import { visibleTiles, tileRectInPlanPx } from '../lib/plan/draw.js';
 import { zoomForSpan } from '../lib/plan/tiles.js';
 import { pickLocalized } from '../lib/content/localize.js';
 import { haversineM, bearingDeg } from '../lib/geometry/geo.js';
+import { planMode } from '../lib/plan/rotation.js';
 import './b-debug.js';
 import './b-cadran.js';
 
@@ -30,9 +31,11 @@ export class BPlan extends BElement {
         <p class="cadran-live sr-only" role="status">${this.cadranText()}</p>
         <div class="cadran-dock"><b-cadran></b-cadran></div>
         <button class="fab guide">${t('guide.cta')}</button>
+        <button class="fab ar">${t('ar.cta')}</button>
         ${this.ctx.debugEnabled ? '<b-debug></b-debug>' : ''}
       </section>`);
     this.querySelector('.fab.guide')?.addEventListener('click', () => this.ctx.showGuide?.());
+    this.querySelector('.fab.ar')?.addEventListener('click', () => this.ctx.showAr?.());
     const dbg = this.querySelector('b-debug');
     if (dbg && !/** @type {any} */ (dbg).ctx) {
       /** @type {any} */ (dbg).ctx = this.ctx;
@@ -135,7 +138,22 @@ export class BPlan extends BElement {
           }
         }
       }
-      g.globalAlpha = 1;
+      // PLAN-2: heading-up rotates the world around the visitor dot
+      const p0 = this.ctx.pose.value;
+      const rot = planMode({
+        userPrefersHeadingUp: this.ctx.carnet.value?.planMode !== 'north-up' && this.ctx.perms.value.orientation === 'granted',
+        heading: p0?.heading ?? null,
+        headingAgeMs: 0, // pose.t freshness handled upstream by fusion
+        disturbed: this.ctx.fusion?.headingDisturbed ?? false,
+        confidence: 'absolute',
+      });
+      if (rot.mode === 'heading-up' && p0) {
+        const ll0 = geoRef.inverse(p0.lat, p0.lon);
+        const s0c = vp.toScreen(ll0.px, ll0.py);
+        g.translate(s0c.x, s0c.y);
+        g.rotate(rot.rotationDeg * Math.PI / 180);
+        g.translate(-s0c.x, -s0c.y);
+      }
       // repère markers (discovered = filled)
       const encountered = this.ctx.carnet.value?.encountered ?? {};
       for (const r of bundle.reperes) {
