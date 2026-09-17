@@ -13,6 +13,9 @@ export const dicts = {
     'plan.setPosition': 'Touchez le plan pour indiquer votre position.',
     'error.bundle': 'Le contenu du lieu n’a pas pu être chargé.',
     'error.retry': 'Réessayer',
+    'preprompt.body': 'Pour vous guider, boussole utilise :',
+    'preprompt.audio': 'Son ambiant (rester sur l’appareil)',
+    'preprompt.continue': 'Continuer',
   },
   en: {
     'nav.plan': 'Map', 'nav.list': 'Landmarks', 'nav.carnet': 'Logbook', 'nav.settings': 'Settings',
@@ -27,5 +30,8 @@ export const dicts = {
     'plan.setPosition': 'Tap the map to set your position.',
     'error.bundle': 'The venue content could not be loaded.',
     'error.retry': 'Retry',
+    'preprompt.body': 'To guide you, boussole uses:',
+    'preprompt.audio': 'Ambient sound (stays on-device)',
+    'preprompt.continue': 'Continue',
   },
 };

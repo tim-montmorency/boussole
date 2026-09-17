@@ -54,6 +54,23 @@
     .cadran { text-align: center; }
     .cadran-label { margin: 4px 0 0; font-size: 12px; color: #58a0ff;
       background: rgba(16,20,24,.75); border-radius: 6px; padding: 2px 8px; }
+    .fab { position: absolute; right: 16px; bottom: 76px; min-height: 48px;
+      padding: 0 20px; border: 0; border-radius: 24px; background: #58a0ff;
+      color: #101418; font: inherit; font-weight: 600; }
+    .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      display: grid; align-items: end; z-index: 10; }
+    .sheet { background: #1b232c; border-radius: 16px 16px 0 0; padding: 20px; }
+    .sheet h2 { margin: 0 0 8px; }
+    .sheet button { display: block; width: 100%; min-height: 48px; margin: 8px 0;
+      border: 0; border-radius: 8px; font: inherit; background: #2c3947; color: inherit; }
+    .sheet button.primary { background: #58a0ff; color: #101418; font-weight: 600; }
+    .sheet button.ghost { background: none; color: #9fb0c0; }
+    .ar-wrap { position: relative; height: 100%; overflow: hidden; }
+    .ar-wrap video { position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; }
+    .ar-wrap canvas { position: absolute; inset: 0; touch-action: manipulation; }
+    .ar-hint { position: absolute; top: 12px; left: 12px; margin: 0;
+      background: rgba(16,20,24,.75); padding: 4px 8px; border-radius: 6px; font-size: 13px; }
   </style>
 </head>
 <body>

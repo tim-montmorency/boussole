@@ -29,8 +29,10 @@ export class BPlan extends BElement {
         <p class="pos-label">${this.posLabel()}</p>
         <p class="cadran-live sr-only" role="status">${this.cadranText()}</p>
         <div class="cadran-dock"><b-cadran></b-cadran></div>
+        <button class="fab guide">${t('guide.cta')}</button>
         ${this.ctx.debugEnabled ? '<b-debug></b-debug>' : ''}
       </section>`);
+    this.querySelector('.fab.guide')?.addEventListener('click', () => this.ctx.showGuide?.());
     const dbg = this.querySelector('b-debug');
     if (dbg && !/** @type {any} */ (dbg).ctx) {
       /** @type {any} */ (dbg).ctx = this.ctx;

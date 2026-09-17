@@ -17,6 +17,7 @@ import { createGeoShell } from './lib/sensors/geo.js';
 import { createOrientationShell } from './lib/sensors/orientation.js';
 import { createAudioShell } from './lib/sensors/audio.js';
 import './components/b-app.js';
+import './components/b-preprompt.js';
 
 const params = new URLSearchParams(location.search);
 const venueUrl = params.get('venue') ?? '../venues/example/venue.json';
@@ -145,6 +146,25 @@ async function boot() {
       });
       perms.set({ ...perms.value, geo: 'granted' });
       return res;
+    };
+    // PERM-9: orientation+motion only — T1 with live heading, no location prompt
+    ctx.guideCompassOnly = async () => {
+      const res = await orient.requestPermissions();
+      perms.set({ ...perms.value, orientation: res.orientation });
+      if (res.orientation === 'granted') {
+        orient.start();
+        orient.headings.subscribe((h) => h && fusion.handleHeading(h.deg));
+      }
+      await audio.unlock();
+      return res;
+    };
+    // PERM-1: the sheet mounts on demand; only its buttons call browser APIs
+    ctx.showGuide = () => {
+      if (document.querySelector('b-preprompt')) return;
+      const sheet = /** @type {any} */ (document.createElement('b-preprompt'));
+      sheet.ctx = ctx;
+      document.body.append(sheet);
+      sheet.render();
     };
     // app heartbeat for PERM-4 (60 s hidden rule)
     setInterval(() => geo.tick(), 5_000);

@@ -44,7 +44,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 190 unit + 17 e2e · tsc clean**
+**Test count: 200 unit + 20 e2e · tsc clean**
 
 ### Decisions made en route (Phase 5)
 - 2026-09-17 — Forge is Node (`tools/forge.mjs`) for M0; the Rust CLI (Phase 6) reimplements the same behaviour. CI can gate bundles today.
@@ -66,9 +66,9 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [x] **Permission denial e2e matrix (CAP-1/2, G2)**: zero-permission navigation completeness, settings PERM-5 states, no dead buttons, grant-without-pose keeps T0
 - [x] **Sensor shells (TDD'd with injected APIs, ARCH-1)**: geolocation with PERM-4 60 s hidden pause/resume · orientation with PERM-2 iOS dual-permission chain + POS-2 absolute/webkitCompassHeading/relative-alpha fallback · camera PERM-3 (environment, no audio, release on hide/stop, denial → clean null) · wake lock AR-8 (re-acquire on visible) · audio PERM-7/8 (lazy AudioContext, silent-buffer unlock, re-unlock on later gesture)
 - [x] `ctx.guide()` — the "Me guider" gesture chain wired in main.js (orientation prompts + geo watch + audio unlock in one tap), heartbeat for PERM-4; e2e covers T2 rise with mocked geolocation
-- [ ] Pre-prompt sheets UI (PERM-1 visual pass; chain itself tested)
-- [ ] Cadran heading from live sensors (works via guide() today; SVG present)
-- [ ] AR overlay (AR-1..8) incl. jsQR ESM wrapper
+- [x] **AR overlay (AR-1..6, 8)**: projection math (bearing→x, pitch horizon, calibrated hFOV, edge chevrons, distance-scaled size/opacity, capture tappability) + `<b-ar>` component (video+canvas at DPR, PERF-1 unchanged-pose frame skip, AR-5 tap-to-capture, AR-8 wake lock). jsQR worker deferred to device pass (R8).
+- [x] **Pre-prompt sheets (PERM-1/9)**: `<b-preprompt>` with Continuer / Boussole seule / Pas maintenant; "Me guider" FAB on the plan; e2e proves dismissal makes no permission calls and compass-only never touches geolocation
+- [ ] AR-7 WebXR flag (post-M0, gated on isSessionSupported)
 - [x] Ambiance presentation state (AMB-3/4): plan cards / AR billboards / audio crossfade plan / video play-pause plan — pure, DOM wiring pending Phase 4 views
 - [x] Debug panel (DEMO-3 UI): pose form, joystick+keys, walk-to-target, trace 1×/4×, live readout; `window.__boussoleDebug` exposed in debug mode for harnesses
 - [x] E2e desk half of DEMO-4: walk-to-target converges ≤3 m (stable over 4 consecutive runs)
