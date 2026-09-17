@@ -44,7 +44,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 166 unit + 14 e2e · tsc clean**
+**Test count: 190 unit + 16 e2e · tsc clean**
 
 ### Decisions made en route (Phase 3)
 - 2026-09-17 — `ctx` (shared app context) typed as `any`: it is the DOM-glue boundary; strict typing stays in `src/lib/`.
@@ -60,8 +60,10 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [x] **Map provider layer (PLAN-5..8)**: `BasemapSource` registry (osm + none; custom = one object), Web-Mercator tile math, visible-tile + tile→plan-px projection, layer stack (basemap → venue overlays → plan), canvas rendering in `<b-plan>`, schema support for `overlays` + `basemap` default, e2e (no third-party traffic by default)
 - [x] **Cadran HUD (CAD-1..4)**: pure display-state module (bearing delta, distance text, hot/warm/cold ring with shape+pulse+colour per A11Y-1, manual/estimée labels, arrow dimming POS-4, haptic schedule CAD-3) + SVG component docked on the plan view; live via sim pose
 - [x] **Permission denial e2e matrix (CAP-1/2, G2)**: zero-permission navigation completeness, settings PERM-5 states, no dead buttons, grant-without-pose keeps T0
-- [ ] Sensor shells: geolocation (PERM-4), orientation/motion (PERM-2), camera (PERM-3) + wake lock (AR-8), audio unlock (PERM-7/8), haptics (CAD-3)
-- [ ] Cadran SVG HUD (CAD-1..4)
+- [x] **Sensor shells (TDD'd with injected APIs, ARCH-1)**: geolocation with PERM-4 60 s hidden pause/resume · orientation with PERM-2 iOS dual-permission chain + POS-2 absolute/webkitCompassHeading/relative-alpha fallback · camera PERM-3 (environment, no audio, release on hide/stop, denial → clean null) · wake lock AR-8 (re-acquire on visible) · audio PERM-7/8 (lazy AudioContext, silent-buffer unlock, re-unlock on later gesture)
+- [x] `ctx.guide()` — the "Me guider" gesture chain wired in main.js (orientation prompts + geo watch + audio unlock in one tap), heartbeat for PERM-4; e2e covers T2 rise with mocked geolocation
+- [ ] Pre-prompt sheets UI (PERM-1 visual pass; chain itself tested)
+- [ ] Cadran heading from live sensors (works via guide() today; SVG present)
 - [ ] AR overlay (AR-1..8) incl. jsQR ESM wrapper
 - [x] Ambiance presentation state (AMB-3/4): plan cards / AR billboards / audio crossfade plan / video play-pause plan — pure, DOM wiring pending Phase 4 views
 - [x] Debug panel (DEMO-3 UI): pose form, joystick+keys, walk-to-target, trace 1×/4×, live readout; `window.__boussoleDebug` exposed in debug mode for harnesses

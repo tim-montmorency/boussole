@@ -13,6 +13,9 @@ import { loadCarnet, saveCarnet } from './lib/store/carnet.js';
 import { computeTier } from './lib/tiers.js';
 import { enuFrame } from './lib/geometry/geo.js';
 import { createDebugSession } from './lib/debug/session.js';
+import { createGeoShell } from './lib/sensors/geo.js';
+import { createOrientationShell } from './lib/sensors/orientation.js';
+import { createAudioShell } from './lib/sensors/audio.js';
 import './components/b-app.js';
 
 const params = new URLSearchParams(location.search);
@@ -106,11 +109,52 @@ async function boot() {
       // exposed for e2e/device harnesses (never present in normal operation)
       /** @type {any} */ (window).__boussoleDebug = ctx.debug;
     }
+
+    // Sensor shells (PERM-*): created lazily, started only from user gestures.
+    const geo = createGeoShell({ geo: navigator.geolocation, doc: document });
+    const orient = createOrientationShell({
+      win: window,
+      // iOS 17: both prompts must chain inside the same tap (PERM-2)
+      requestOrientation: typeof DeviceOrientationEvent !== 'undefined'
+        && typeof /** @type {any} */ (DeviceOrientationEvent).requestPermission === 'function'
+        ? () => /** @type {any} */ (DeviceOrientationEvent).requestPermission()
+        : null,
+      requestMotion: typeof DeviceMotionEvent !== 'undefined'
+        && typeof /** @type {any} */ (DeviceMotionEvent).requestPermission === 'function'
+        ? () => /** @type {any} */ (DeviceMotionEvent).requestPermission()
+        : null,
+    });
+    const audio = createAudioShell({ makeContext: () => new AudioContext() });
+    ctx.sensors = { geo, orient, audio };
+
+    // "Me guider" gesture (PERM-1/2/7): one tap → orientation+motion prompts,
+    // geolocation watch, audio unlock. Denials degrade silently (CAP-2/3).
+    ctx.guide = async () => {
+      const res = await orient.requestPermissions();
+      perms.set({ ...perms.value, orientation: res.orientation });
+      if (res.orientation === 'granted') {
+        orient.start();
+        orient.headings.subscribe((h) => h && fusion.handleHeading(h.deg));
+      }
+      await audio.unlock(); // PERM-7: same gesture
+      state.audioUnlocked = audio.unlocked;
+      carnet.set({ ...state, audioUnlocked: audio.unlocked });
+      navigator.geolocation && geo.start();
+      geo.fixes.subscribe((f) => {
+        if (f) { fusion.setGpsActive(true); fusion.handleFix(f); }
+      });
+      perms.set({ ...perms.value, geo: 'granted' });
+      return res;
+    };
+    // app heartbeat for PERM-4 (60 s hidden rule)
+    setInterval(() => geo.tick(), 5_000);
   }
 
   const app = /** @type {any} */ (document.createElement('b-app'));
   app.ctx = ctx;
   document.querySelector('main')?.replaceChildren(app);
+  // harness hook for e2e/device tests (not part of the UI surface)
+  /** @type {any} */ (window).__ctx = ctx;
 }
 
 boot();
