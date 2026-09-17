@@ -44,7 +44,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Pre-prompt sheets (PERM-1/9) — deferred to Phase 4 with the sensor shells they gate
 - [ ] Repère search (M1)
 
-**Test count: 209 unit + 23 e2e · tsc clean**
+**Test count: 212 unit + 23 e2e · tsc clean**
 
 ### Decisions made en route (Phase 5)
 - 2026-09-17 — Forge is Node (`tools/forge.mjs`) for M0; the Rust CLI (Phase 6) reimplements the same behaviour. CI can gate bundles today.

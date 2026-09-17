@@ -42,5 +42,6 @@ test.describe('CAP-2 — denial paths produce no dead UI', () => {
     await page.getByRole('button', { name: 'Repères' }).click();
     await page.locator('.repere-list .repere').first().click();
     await expect(page.getByRole('button', { name: 'Je suis là' })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Définir comme destination' })).toBeEnabled();
   });
 });

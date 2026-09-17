@@ -18,17 +18,18 @@ test.describe('DEMO-3/4 — debug mode (desk demo)', () => {
     const panel = page.getByTestId('debug-panel');
     await expect(panel).toBeVisible();
 
-    // apply start pose (defaults are the entrance ancre)
+    // the readout pose starts at the Agora (debug defaults)
     await panel.getByRole('button', { name: 'apply' }).click();
     await page.evaluate(() => /** @type {any} */ (window).__boussoleDebug.tick(1));
     let ro = await readout(panel);
     expect(ro.pose.source).toBe('sim');
     expect(ro.pose.heading).toBe(90);
+    expect(ro.pose.lat).toBeCloseTo(45.560089448816306, 6);
 
-    // walk to the only repère (r-atrium): drive the sim directly — headless
+    // walk to the main destination (r-studios): drive the sim directly — headless
     // Chromium throttles background timers, so the panel's interval can't be
     // trusted to advance the walk.
-    await panel.locator('#dbg-target').selectOption('r-atrium');
+    await panel.locator('#dbg-target').selectOption('r-studios');
     await panel.getByRole('button', { name: 'walk to target' }).click();
     await page.evaluate(() => {
       const d = /** @type {any} */ (window).__boussoleDebug;

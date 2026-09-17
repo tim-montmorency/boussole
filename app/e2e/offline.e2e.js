@@ -25,9 +25,9 @@ test.describe('OFF-1 — offline after first load', () => {
 
     // full navigation offline
     await page.getByRole('button', { name: 'Repères' }).click();
-    await expect(page.locator('.repere-list .repere')).toHaveCount(1);
+    await expect(page.locator('.repere-list .repere')).toHaveCount(2);
     await page.locator('.repere-list .repere').first().click();
-    await expect(page.locator('.repere-detail h1')).toHaveText("L'atrium");
+    await expect(page.locator('.repere-detail h1')).toHaveText('Studios Multimédia');
     await page.getByRole('button', { name: 'Je suis là' }).click();
     await page.getByRole('button', { name: 'Carnet' }).click();
     await expect(page.locator('ul.carnet li')).toHaveCount(1);

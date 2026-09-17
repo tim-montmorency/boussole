@@ -45,28 +45,28 @@
   },
   "debug": {
     "startPose": {
-      "lat": 45.55789,
-      "lon": -73.7161,
+      "lat": 45.560089448816306,
+      "lon": -73.71876267046022,
       "heading": 90
     }
   },
   "ancres": [
     {
-      "id": "a-entree",
-      "lat": 45.55789,
-      "lon": -73.7161,
-      "label": "Entrée principale"
+      "id": "a-agora",
+      "lat": 45.560089448816306,
+      "lon": -73.71876267046022,
+      "label": "Agora"
     }
   ],
   "reperes": [
     {
-      "id": "r-atrium",
+      "id": "r-studios",
       "type": "repere",
       "lat": 45.55923926291231,
       "lon": -73.71763634643162,
       "name": {
-        "fr": "L'atrium",
-        "en": "The atrium"
+        "fr": "Studios Multimédia",
+        "en": "Multimedia Studios"
       },
       "hint": {
         "fr": "Là où la lumière tombe du toit."
@@ -84,27 +84,20 @@
             "fr": "Sous la verrière."
           },
           "trigger": "approche"
-        },
-        {
-          "kind": "son",
-          "src": "media/atrium.opus",
-          "trigger": "zone",
-          "zone": [
-            [
-              45.5576,
-              -73.7156
-            ],
-            [
-              45.5577,
-              -73.7154
-            ],
-            [
-              45.5575,
-              -73.7154
-            ]
-          ]
         }
       ],
+      "hidden": false,
+      "captureRadius": 6
+    },
+    {
+      "id": "r-agora",
+      "type": "repere",
+      "lat": 45.560089448816306,
+      "lon": -73.71876267046022,
+      "name": {
+        "fr": "L'Agora",
+        "en": "The Agora"
+      },
       "hidden": false,
       "captureRadius": 6
     }

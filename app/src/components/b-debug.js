@@ -5,6 +5,7 @@
  */
 import { BElement, esc } from './base.js';
 import { pickLocalized } from '../lib/content/localize.js';
+import { collectFieldLog, formatFieldLog } from '../lib/debug/fieldlog.js';
 
 export class BDebug extends BElement {
   connectedCallback() { this._start(); }
@@ -59,8 +60,8 @@ export class BDebug extends BElement {
       <section class="debug card" data-testid="debug-panel">
         <h2>debug</h2>
         <form id="dbg-pose">
-          <label>lat <input name="lat" type="number" step="any" value="45.55789"></label>
-          <label>lon <input name="lon" type="number" step="any" value="-73.71610"></label>
+          <label>lat <input name="lat" type="number" step="any" value="45.560089448816306"></label>
+          <label>lon <input name="lon" type="number" step="any" value="-73.71876267046022"></label>
           <label>heading° <input name="heading" type="number" value="90"></label>
           <label>accuracy m <input name="accuracy" type="number" value="1"></label>
           <button type="submit">apply</button>
@@ -78,8 +79,43 @@ export class BDebug extends BElement {
           <button id="dbg-play1">1×</button>
           <button id="dbg-play4">4×</button>
         </div>
+        <button id="dbg-runtest">${this.ctx.i18n.t('debug.runTest')}</button>
         <pre id="dbg-readout"></pre>
       </section>`);
+    // Self-test: walk to the current target, then copy a full field log to
+    // the clipboard — paste it anywhere to share a real-phone session.
+    this.querySelector('#dbg-runtest')?.addEventListener('click', async (e) => {
+      const btn = /** @type {HTMLButtonElement} */ (e.target);
+      const target = this.ctx.bundle.reperes.find((/** @type {any} */ r) =>
+        r.id === (this.ctx.targetId?.value ?? 'r-studios')) ?? this.ctx.bundle.reperes[0];
+      this.ctx.debug.walkTo(target);
+      let rem = null;
+      for (let i = 0; i < 2000 && rem !== 0; i++) rem = this.ctx.debug.tick(250);
+      const log = collectFieldLog({
+        ua: navigator.userAgent,
+        bundle: this.ctx.bundle,
+        pose: this.ctx.pose.value,
+        perms: this.ctx.perms.value,
+        tier: this.ctx.tier.value,
+        audioUnlocked: this.ctx.carnet.value?.audioUnlocked ?? false,
+        carnet: this.ctx.carnet.value,
+        extra: {
+          walkRemainingM: rem,
+          hfov: Number(localStorage.getItem('boussole:hfov')) || 65,
+          online: navigator.onLine,
+        },
+      });
+      try {
+        await navigator.clipboard.writeText(formatFieldLog(log));
+        btn.textContent = this.ctx.i18n.t('debug.copied');
+      } catch {
+        // clipboard needs a gesture/permission on some browsers — show the log inline
+        const r = this.querySelector('#dbg-readout');
+        if (r) r.textContent = formatFieldLog(log);
+        btn.textContent = '⚠ clipboard';
+      }
+      setTimeout(() => { btn.textContent = this.ctx.i18n.t('debug.runTest'); }, 2000);
+    });
     this.querySelector('#dbg-pose')?.addEventListener('submit', (e) => {
       e.preventDefault();
       const f = new FormData(/** @type {HTMLFormElement} */ (e.target));

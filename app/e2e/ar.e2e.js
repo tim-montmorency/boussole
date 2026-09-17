@@ -45,7 +45,7 @@ test.describe('AR view — point the phone at the target', () => {
     await expect(page.locator('b-ar')).toHaveCount(0);
     await expect(page.locator('b-plan canvas')).toBeVisible();
     await page.getByRole('button', { name: 'Repères' }).click();
-    await expect(page.locator('.repere-list .repere')).toHaveCount(1);
+    await expect(page.locator('.repere-list .repere')).toHaveCount(2);
     await context.close();
   });
 

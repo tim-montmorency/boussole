@@ -36,9 +36,14 @@ export class BRepere extends BElement {
         ${stats}
         ${cards}
         <button class="checkin">${t('repere.checkin')}</button>
+        <button class="set-target">${t('repere.setTarget')}</button>
         ${seen}
       </article>`);
     this.querySelector('.checkin')?.addEventListener('click', () => this.ctx.checkin(r.id));
+    this.querySelector('.set-target')?.addEventListener('click', () => {
+      this.ctx.setTarget?.(r.id);
+      this.ctx.router.go('plan');
+    });
   }
 }
 customElements.define('b-repere', BRepere);

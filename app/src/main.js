@@ -51,6 +51,7 @@ async function boot() {
     i18n, router, bundle, bundleError, perms, carnet,
     pose: observable(null),
     tier: observable('T0'),
+    targetId: observable(/** @type {string | null} */ (null)),
     geoRef: null, fusion: null, ambiance: null, mPerPx: 0.1,
     setManualPose() {}, checkin() {}, async eraseAll() {},
   };

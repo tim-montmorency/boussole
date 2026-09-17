@@ -14,10 +14,10 @@ test.describe('T0 — Plan (zero permissions)', () => {
     await page.goto('./');
     // list shows the repère
     await page.getByRole('button', { name: 'Repères' }).click();
-    await expect(page.locator('.repere-list .repere')).toHaveCount(1);
+    await expect(page.locator('.repere-list .repere')).toHaveCount(2);
     await page.locator('.repere-list .repere').first().click();
     // detail shows name + hint
-    await expect(page.locator('.repere-detail h1')).toHaveText("L'atrium");
+    await expect(page.locator('.repere-detail h1')).toHaveText('Studios Multimédia');
     await expect(page.locator('.repere-detail .hint')).toContainText('lumière');
     // no pose yet → no stats
     await expect(page.locator('.repere-detail .stats')).toHaveCount(0);
@@ -39,7 +39,7 @@ test.describe('T0 — Plan (zero permissions)', () => {
     await page.getByRole('button', { name: 'Je suis là' }).click();
     await page.getByRole('button', { name: 'Carnet' }).click();
     await expect(page.locator('ul.carnet li')).toHaveCount(1);
-    await expect(page.locator('ul.carnet')).toContainText('L\'atrium');
+    await expect(page.locator('ul.carnet')).toContainText('Studios Multimédia');
     await expect(page.locator('ul.carnet')).toContainText('non vérifié');
     // persists across reload
     await page.reload();
@@ -48,7 +48,7 @@ test.describe('T0 — Plan (zero permissions)', () => {
   });
 
   test('entrance QR ancre gives an instant start pose (PERM-6)', async ({ page }) => {
-    await page.goto('./?ancre=a-entree');
+    await page.goto('./?ancre=a-agora');
     await expect(page.locator('b-plan canvas')).toBeVisible();
     await expect(page.locator('.pos-label')).toHaveText(''); // ancre pose is not "manual"
     await page.getByRole('button', { name: 'Repères' }).click();

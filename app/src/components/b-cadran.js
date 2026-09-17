@@ -11,12 +11,16 @@ const RING_COLOUR = { hot: '#57d98e', warm: '#e8b93e', cold: '#58a0ff', none: '#
 export class BCadran extends BElement {
   connectedCallback() {
     this.track(this.ctx.pose);
+    if (this.ctx.targetId) this.track(this.ctx.targetId);
     this.render();
   }
   render() {
     if (!this.ctx) return;
     const { t } = this.ctx.i18n;
-    const target = this.ctx.bundle?.reperes?.[0] ?? null; // M0: single destination
+    // target = selected repère, else the first non-hidden one (M0 default)
+    const repères = this.ctx.bundle?.reperes ?? [];
+    const target = repères.find((/** @type {any} */ r) => r.id === this.ctx.targetId?.value)
+      ?? repères.find((/** @type {any} */ r) => !r.hidden) ?? null;
     const s = cadranState(this.ctx.pose.value, target);
     if (s.haptic && 'vibrate' in navigator) {
       navigator.vibrate(s.haptic.type === 'arrive' ? [80, 40, 80] : 30); // CAD-3
