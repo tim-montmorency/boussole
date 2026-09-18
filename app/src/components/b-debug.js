@@ -28,7 +28,7 @@ export class BDebug extends BElement {
   }
 
   tick() {
-    if (!this.ctx?.debug) return;
+    if (!this.ctx?.debug || this._logShown) return; // log inline takes priority
     this.ctx.debug.tick(100);
     const r = this.querySelector('#dbg-readout');
     if (r) {
@@ -107,10 +107,13 @@ export class BDebug extends BElement {
         },
       });
       try {
+        if (!navigator.clipboard?.writeText) throw new Error('no clipboard');
         await navigator.clipboard.writeText(formatFieldLog(log));
         btn.textContent = '📋 ' + this.ctx.i18n.t('debug.copied');
       } catch {
-        // clipboard needs a gesture/permission on some browsers — show the log inline
+        // clipboard needs a gesture/permission on some browsers — show the log
+        // inline and freeze the readout so the interval tick can't overwrite it
+        this._logShown = true;
         const r = this.querySelector('#dbg-readout');
         if (r) r.textContent = formatFieldLog(log);
         btn.textContent = '📋 ⚠';

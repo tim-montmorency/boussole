@@ -93,7 +93,7 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - 2026-09-17 — Basemap layer spec'd as PLAN-5..8: opt-in per venue (`none` default keeps PRIV-1 true), OSM only shipped provider, venue-declared georeferenced overlay images between basemap and plan, tile URLs snapped to viewport bounds (never pose).
 - 2026-09-17 — Custom-element lifecycle: `connectedCallback` runs before the parent assigns `ctx`; subscriptions that need ctx live in `bind()`, called by the parent. (Root cause of two field bugs.)
 - 2026-09-17 — Debug self-test uses `walkToEnd` (single fusion emit); driving hundreds of UI-emitting ticks synchronously crashes the renderer (headless Chromium tab crash at ~400).
-
+- 2026-09-18 — b-plan re-renders only on structural changes (debug toggle), never on pose ticks: pose-driven re-render was destroying the debug panel mid-interaction (the CI "clipboard fallback" failure was this, not the clipboard).
 ## Phase 5 — PWA + venue (M0 gate)
 - [x] **Forge `validate` + `hash`** (`tools/forge.mjs`): schema validation, media sha256 verify/write, georeference residual report — reference implementation for the Rust CLI (Phase 6)
 - [x] `tools/gen-precache.mjs` — regenerates the sw.js precache manifest (46 files)

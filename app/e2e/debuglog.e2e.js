@@ -39,12 +39,14 @@ test.describe('debug toggle + field log', () => {
 
   test('fallback: clipboard refusal renders the log inline', async ({ page }) => {
     await page.goto('./?debug=1');
-    await page.addInitScript(() => {
-      Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
-    });
-    await page.reload();
     const panel = page.getByTestId('debug-panel');
     await panel.getByRole('button', { name: 'apply' }).click();
+    // remove the clipboard API on the live instance (addInitScript doesn't
+    // survive the module graph reliably for instance getters)
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, 'clipboard',
+        { value: undefined, configurable: true, writable: true });
+    });
     await panel.locator('#dbg-runtest').click();
     await expect(panel.locator('#dbg-readout')).toContainText('boussole field log');
   });

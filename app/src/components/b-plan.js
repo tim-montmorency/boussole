@@ -18,7 +18,6 @@ export class BPlan extends BElement {
   bind() {
     if (this._bound) return;
     this._bound = true;
-    this.track(this.ctx.pose);
     this.track(this.ctx.carnet);
     if (this.ctx.debugEnabled) this.track(this.ctx.debugEnabled);
     this.render();
@@ -26,6 +25,19 @@ export class BPlan extends BElement {
   render() {
     if (!this.ctx) return; // parsed before ctx assignment
     const { t } = this.ctx.i18n;
+    const dbgOn = !!this.ctx.debugEnabled?.value;
+    // pose changes must NOT re-render (that would destroy the debug panel and
+    // canvas wiring); only structural changes (debug toggle, carnet) do.
+    if (this._renderedOnce && this._dbgWasOn === dbgOn) {
+      const live = this.querySelector('.cadran-live');
+      if (live) live.textContent = this.cadranText();
+      const lbl = this.querySelector('.pos-label');
+      if (lbl) lbl.textContent = this.posLabel();
+      return;
+    }
+    /** @type {boolean} */ this._dbgWasOn;
+    this._dbgWasOn = dbgOn;
+    this._renderedOnce = true;
     this.html(`
       <section class="plan-wrap">
         <canvas aria-hidden="true"></canvas>
@@ -36,7 +48,7 @@ export class BPlan extends BElement {
         <button class="fab guide">${t('guide.cta')}</button>
         <button class="fab ar">${t('ar.cta')}</button>
         <button class="fab dbg-toggle" aria-label="debug">🐛</button>
-        ${this.ctx.debugEnabled?.value ? '<b-debug></b-debug>' : ''}
+        ${dbgOn ? '<b-debug></b-debug>' : ''}
       </section>`);
     this.querySelector('.fab.guide')?.addEventListener('click', () => this.ctx.showGuide?.());
     this.querySelector('.fab.ar')?.addEventListener('click', () => this.ctx.showAr?.());
@@ -49,7 +61,7 @@ export class BPlan extends BElement {
     const cad = this.querySelector('b-cadran');
     if (cad && !/** @type {any} */ (cad).ctx) /** @type {any} */ (cad).ctx = this.ctx;
     this.setupCanvas(/** @type {HTMLCanvasElement} */ (this.querySelector('canvas')));
-    // keep the live cadran text and position label fresh
+    // live text only — no full re-render on pose
     this._offs.push(this.ctx.pose.subscribe(() => {
       const live = this.querySelector('.cadran-live');
       if (live) live.textContent = this.cadranText();
