@@ -103,8 +103,10 @@ Live progress tracker. Phases from [plan.md](plan.md); requirements from [sdd.md
 - [ ] Montmorency pavillon A bundle: real georeferenced plan raster, real boucle + texte tableaux, entrance QR (DEMO-1/2) — needs venue assets
 - [ ] **M0 acceptance: DEMO-4 on-site** (needs devices + venue assets)
 
-## Phase 6 — Forge full (post-M0)
-- [ ] `init`, `slice` (PLAN-4), `qr-sheet` PDF
+## Phase 6 — Forge (Rust)
+- [x] `boussole-forge` crate: `validate` (structural + media sha256 + georeference residual) matching the Node reference; `hash`; `qr-sheet` (print-ready HTML); `init` (scaffold a venue, refuses overwrite, empty control points warn not error); `slice` (PLAN-4 pyramid)
+- [x] Golden tests incl. example-bundle validation and init/slice unit tests
+- [ ] printpdf styling pass if HTML proves insufficient for field printing
 
 ## Decisions made en route
 - 2026-09-17 — Stack: no build step, pure JS ESM + Web Components, zero runtime deps (see sdd.md §13).

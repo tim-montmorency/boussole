@@ -1,5 +1,7 @@
 mod cli;
 mod geo;
+mod init;
+mod slice;
 mod venue;
 
 use clap::Parser;
@@ -41,6 +43,32 @@ fn main() -> ExitCode {
         Cmd::QrSheet { dir, out } => match qr_sheet(&dir, &out) {
             Ok(n) => {
                 println!("✓ {n} QRs → {}", out.display());
+                ExitCode::SUCCESS
+            }
+            Err(e) => {
+                eprintln!("✗ {e}");
+                ExitCode::FAILURE
+            }
+        },
+        Cmd::Init { dir, id, name, lat, lon } => {
+            match init::init(&dir, &init::InitArgs { id: &id, name: &name, lat, lon }) {
+                Ok(()) => {
+                    println!("✓ scaffolded {} ({})", dir.display(), id);
+                    ExitCode::SUCCESS
+                }
+                Err(e) => {
+                    eprintln!("✗ {e}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        Cmd::Slice { dir } => match slice::slice(&dir) {
+            Ok(0) => {
+                println!("✓ plan is ≤4096 px — no slicing needed");
+                ExitCode::SUCCESS
+            }
+            Ok(n) => {
+                println!("✓ wrote {n} tiles → plan.tiles/");
                 ExitCode::SUCCESS
             }
             Err(e) => {

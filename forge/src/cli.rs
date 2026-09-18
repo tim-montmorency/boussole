@@ -18,4 +18,14 @@ pub enum Cmd {
     Hash { dir: PathBuf },
     /// Emit a printable QR sheet (HTML — print to PDF from any browser).
     QrSheet { dir: PathBuf, #[arg(long, default_value = "qrs.html")] out: PathBuf },
+    /// Scaffold a new venue bundle directory.
+    Init {
+        dir: PathBuf,
+        #[arg(long)] id: String,
+        #[arg(long)] name: String,
+        #[arg(long)] lat: f64,
+        #[arg(long)] lon: f64,
+    },
+    /// Slice an oversized plan (>4096 px) into a 2-level tile pyramid (PLAN-4).
+    Slice { dir: PathBuf },
 }

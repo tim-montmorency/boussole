@@ -67,23 +67,27 @@ pub fn validate(dir: &Path) -> Report {
     // Georeference residuals (PLAN-1)
     let mut max_residual_m = None;
     if let Some(cps) = bundle.pointer("/plan/controlPoints").and_then(|v| v.as_array()) {
-        let points: Vec<ControlPoint> = cps
-            .iter()
-            .filter_map(|c| Some(ControlPoint {
-                px: c.get("px")?.as_f64()?,
-                py: c.get("py")?.as_f64()?,
-                lat: c.get("lat")?.as_f64()?,
-                lon: c.get("lon")?.as_f64()?,
-            }))
-            .collect();
-        match fit_affine(&points) {
-            Ok((_, _, res)) => {
-                max_residual_m = Some(res);
-                if res > 5.0 {
-                    warnings.push(format!("georeference residual {res:.2} m > 5 m — check control points"));
+        if cps.is_empty() {
+            warnings.push("plan.controlPoints is empty — georeference the plan before publishing".into());
+        } else {
+            let points: Vec<ControlPoint> = cps
+                .iter()
+                .filter_map(|c| Some(ControlPoint {
+                    px: c.get("px")?.as_f64()?,
+                    py: c.get("py")?.as_f64()?,
+                    lat: c.get("lat")?.as_f64()?,
+                    lon: c.get("lon")?.as_f64()?,
+                }))
+                .collect();
+            match fit_affine(&points) {
+                Ok((_, _, res)) => {
+                    max_residual_m = Some(res);
+                    if res > 5.0 {
+                        warnings.push(format!("georeference residual {res:.2} m > 5 m — check control points"));
+                    }
                 }
+                Err(e) => errors.push(format!("georeference: {e}")),
             }
-            Err(e) => errors.push(format!("georeference: {e}")),
         }
     }
 
