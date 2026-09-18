@@ -11,5 +11,6 @@
     "lib": ["ES2022", "DOM"],
     "types": ["node"]
   },
-  "include": ["src/**/*.js"]
+  "include": ["src/**/*.js"],
+  "exclude": ["src/lib/vendor/**"]
 }

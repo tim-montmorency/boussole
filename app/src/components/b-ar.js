@@ -5,6 +5,7 @@
  */
 import { BElement, esc } from './base.js';
 import { arMarkers } from '../lib/ar/project.js';
+import { createQrScanner } from '../lib/ar/scan.js';
 import { pickLocalized } from '../lib/content/localize.js';
 
 const HFov_KEY = 'boussole:hfov';
@@ -26,7 +27,40 @@ export class BAr extends BElement {
     const stream = await this.ctx.camera?.start(); // PERM-3
     const video = /** @type {HTMLVideoElement} */ (this.querySelector('video'));
     if (stream && video) { video.srcObject = stream; video.play().catch(() => {}); }
+    this._startScan(video);
     this._drawLoop();
+  }
+  /** AR-6: ancre QR scan — BarcodeDetector when present, else jsQR on
+   * downscaled frames (320 px), throttled with 30 s idle stop (PERF-2).
+   * @param {HTMLVideoElement | null} video */
+  _startScan(video) {
+    const BD = /** @type {any} */ (globalThis).BarcodeDetector;
+    this._scanner = createQrScanner({
+      barcodeDetector: BD ? new BD({ formats: ['qr_code'] }) : null,
+    });
+    this._scanCanvas = document.createElement('canvas');
+    this._scanCanvas.width = 320; // downscale target (PERF-2)
+    this._scanTimer = setInterval(() => this._scanOnce(video), 200);
+  }
+  /** @param {HTMLVideoElement | null} video */
+  async _scanOnce(video) {
+    const c = /** @type {HTMLCanvasElement | undefined} */ (this._scanCanvas);
+    if (!this._scanner?.running || !video?.videoWidth || !c) return;
+    c.height = Math.round(320 * video.videoHeight / video.videoWidth);
+    const g = c.getContext('2d', { willReadFrequently: true });
+    if (!g) return;
+    g.drawImage(video, 0, 0, c.width, c.height);
+    const frame = g.getImageData(0, 0, c.width, c.height);
+    const hit = await this._scanner.tick(
+      { data: frame.data, width: c.width, height: c.height, $frame: frame }, performance.now());
+    if (hit?.type === 'ancre') {
+      const ancre = (this.ctx.bundle?.ancres ?? []).find((/** @type {any} */ a) => a.id === hit.id);
+      if (ancre) {
+        // hard reset (POS-1): ancre scan sets position with 1 m accuracy
+        this.ctx.fusion.handleFix({ kind: 'ancre', lat: ancre.lat, lon: ancre.lon, accuracy: 1, t: Date.now() });
+        this.ctx.onAncreScan?.(ancre);
+      }
+    }
   }
   render() {
     if (!this.ctx) return;

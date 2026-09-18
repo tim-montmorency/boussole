@@ -1,0 +1,39 @@
+# boussole CI: lint (typecheck), unit tests, forge validation, e2e.
+name: boussole
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install
+        working-directory: app
+        run: npm ci
+
+      - name: Typecheck (tsc --checkJs)
+        working-directory: app
+        run: npm run check
+
+      - name: Unit tests (vitest)
+        working-directory: app
+        run: npm test
+
+      - name: Forge validates the example venue
+        run: node tools/forge.mjs validate venues/example
+
+      - name: Playwright (Chromium)
+        working-directory: app
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e
